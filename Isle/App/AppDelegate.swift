@@ -1,5 +1,6 @@
 import AppKit
 import Carbon.HIToolbox
+import ServiceManagement
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
@@ -12,8 +13,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var clipboardHotKey: GlobalHotKey?
     private var converterHotKey: GlobalHotKey?
 
+    /// Running from /Applications (the installed copy) rather than a dev build.
+    private var isInstalled: Bool { Bundle.main.bundlePath.hasPrefix("/Applications/") }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // One Isle at a time: a second copy would fight over the notch and the socket.
+        let others = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
+            .filter { $0.processIdentifier != getpid() }
+        if !others.isEmpty {
+            NSApp.terminate(nil)
+            return
+        }
         Prefs.register()
+        // First launch of the installed copy: start at login by default.
+        if isInstalled, !UserDefaults.standard.bool(forKey: "loginItemConfigured") {
+            UserDefaults.standard.set(true, forKey: "loginItemConfigured")
+            try? SMAppService.mainApp.register()
+        }
         IsleLog.write("startup: accessibility=\(AXIsProcessTrusted())")
         // Password dots and the HUD both need Accessibility: ask once, via the system prompt.
         if !AXIsProcessTrusted(), !UserDefaults.standard.bool(forKey: "askedAccessibility") {
@@ -29,7 +45,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         hud.start()
 
         // Local socket: coding-agent hook events (and later MCP requests).
-        HookInstaller.writeShim()
+        // Only the installed copy points the hook / MCP shims at itself, so dev builds
+        // never hijack the working setup.
+        if isInstalled || !FileManager.default.fileExists(atPath: HookInstaller.shimURL.path) {
+            HookInstaller.writeShim()
+        }
         let server = IsleSocketServer { request, reply in
             let type = (try? JSONSerialization.jsonObject(with: request) as? [String: Any])?["type"] as? String
             switch type {
@@ -139,6 +159,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         menu.addItem(.separator())
+        menu.addItem(toggle("Запускать при входе", SMAppService.mainApp.status == .enabled, #selector(toggleLoginItem)))
+        if !isInstalled {
+            let dev = NSMenuItem(title: "Dev-сборка: \((Bundle.main.bundlePath as NSString).abbreviatingWithTildeInPath)", action: nil, keyEquivalent: "")
+            dev.isEnabled = false
+            menu.addItem(dev)
+        }
         menu.addItem(item("Выйти из Isle", #selector(quit), key: "q"))
     }
 
@@ -207,6 +233,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func requestAccessibility() {
         LoginwindowPasswordField.requestTrust()
+    }
+
+    @objc private func toggleLoginItem() {
+        do {
+            if SMAppService.mainApp.status == .enabled {
+                try SMAppService.mainApp.unregister()
+            } else {
+                try SMAppService.mainApp.register()
+            }
+        } catch {
+            IsleLog.write("login item: \(error.localizedDescription)")
+            if SMAppService.mainApp.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
+        }
     }
 
     @objc private func quit() { NSApp.terminate(nil) }

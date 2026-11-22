@@ -2,15 +2,26 @@
 
 Personal Dynamic Island for the MacBook notch + a Now Playing lock screen. Spotify only.
 
-## Build & run
+## Install
+
+```bash
+./scripts/install.sh
+```
+
+Builds Release, replaces `/Applications/Isle.app` and launches it. The installed copy starts at
+login (toggle in the menu: «Запускать при входе») and is the one Claude Code hooks / MCP point to.
+
+## Develop
 
 ```bash
 xcodegen generate
 xcodebuild -project Isle.xcodeproj -scheme Isle -configuration Debug -derivedDataPath build build
-open build/Build/Products/Debug/Isle.app
 ```
 
-Menu bar icon (capsule) → settings and **Превью lock screen** (⌘L in the menu; Esc closes).
+Dev builds never take over the hook / MCP shims and refuse to run next to the installed copy;
+check UI with `--snapshot` / `--uitest`, then `./scripts/install.sh`.
+
+Menu bar icon (capsule) → settings, lock screen preview and editor, clipboard (⌥⇧V), converter (⌥⇧C).
 
 First Spotify call asks for Automation permission (System Settings → Privacy & Security → Automation).
 

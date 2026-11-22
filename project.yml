@@ -11,7 +11,7 @@ settings:
     CODE_SIGN_STYLE: Manual
     CODE_SIGN_IDENTITY: "Apple Development"
     ENABLE_HARDENED_RUNTIME: YES
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
     DEAD_CODE_STRIPPING: YES
 targets:
@@ -24,6 +24,8 @@ targets:
       path: Isle/Resources/Info.plist
       properties:
         CFBundleDisplayName: Isle
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.utilities
         NSAppleEventsUsageDescription: "Isle reads the current Spotify track and controls playback."
