@@ -295,26 +295,31 @@ private struct ShelfPalette: View {
             }
             .frame(width: 6 * 58 + 5 * 10, alignment: .leading)
             Spacer()
-            pageButton("plus.rectangle.on.rectangle", help: "Новая страница") { model.addPage() }
-            if model.pageCount > 1 {
-                pageButton("trash", help: "Удалить эту страницу (виджеты вернутся в палитру)") { model.deleteCurrentPage() }
+            VStack(alignment: .trailing, spacing: 14) {
+                HStack(spacing: 10) {
+                    pageButton("plus.rectangle.on.rectangle", help: "Новая страница") { model.addPage() }
+                    if model.pageCount > 1 {
+                        pageButton("trash", help: "Удалить эту страницу (виджеты вернутся в палитру)") { model.deleteCurrentPage() }
+                    }
+                    Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) { model.cancelEditing() } } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 38, height: 38)
+                            .isleGlass(Circle())
+                    }
+                    .buttonStyle(PressableStyle())
+                    Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) { model.commitEditing() } } label: {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 38, height: 38)
+                            .background(Circle().fill(Color.accentColor))
+                    }
+                    .buttonStyle(PressableStyle())
+                }
+                ShelfBackgroundControls()
             }
-            Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) { model.cancelEditing() } } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 38, height: 38)
-                    .isleGlass(Circle())
-            }
-            .buttonStyle(PressableStyle())
-            Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) { model.commitEditing() } } label: {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 38, height: 38)
-                    .background(Circle().fill(Color.accentColor))
-            }
-            .buttonStyle(PressableStyle())
         }
         .frame(height: NotchMetrics.paletteHeight - 14)
     }
@@ -377,6 +382,53 @@ struct ShelfTabBar: View {
                 .background {
                     if selected { Capsule().fill(Color.white.opacity(0.18)) }
                 }
+                .contentShape(Capsule())
+        }
+        .buttonStyle(PressableStyle())
+    }
+}
+
+/// Shelf look: solid black (default) or glass with a darkness slider.
+enum ShelfLook {
+    static let styleKey = "shelfBackground"
+    static let darknessKey = "shelfDarkness"
+    static let black = "black"
+    static let glass = "glass"
+}
+
+struct ShelfBackgroundControls: View {
+    @AppStorage(ShelfLook.styleKey) private var style = ShelfLook.black
+    @AppStorage(ShelfLook.darknessKey) private var darkness = 0.55
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Text("Фон").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
+            HStack(spacing: 2) {
+                option("Чёрный", ShelfLook.black)
+                option("Стекло", ShelfLook.glass)
+            }
+            .padding(2)
+            .background(Capsule().fill(Color.white.opacity(0.08)))
+            if style == ShelfLook.glass {
+                Image(systemName: "circle.dashed").font(.system(size: 10, weight: .semibold)).opacity(0.5)
+                ScrubBar(progress: darkness, height: 5, live: true) { darkness = max(0.05, $0) }
+                    .frame(width: 110)
+                    .help("Прозрачная ↔ тёмная")
+                Image(systemName: "circle.fill").font(.system(size: 10, weight: .semibold)).opacity(0.5)
+            }
+        }
+        .foregroundStyle(.white)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: style)
+    }
+
+    private func option(_ title: String, _ value: String) -> some View {
+        Button { style = value } label: {
+            Text(title)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white.opacity(style == value ? 1 : 0.55))
+                .padding(.horizontal, 10)
+                .frame(height: 24)
+                .background(Capsule().fill(Color.white.opacity(style == value ? 0.22 : 0)))
                 .contentShape(Capsule())
         }
         .buttonStyle(PressableStyle())

@@ -48,7 +48,7 @@ struct NotchRootView: View {
 
         VStack(spacing: 8) {
             ZStack(alignment: .top) {
-                shape.fill(Color.black)
+                IslandBackground(shape: shape, expanded: model.expanded, notchHeight: model.notchSize.height, height: size.height)
                 Group {
                     if model.expanded {
                         ShelfView(model: model, spotify: spotify)
@@ -129,5 +129,47 @@ struct NotchLiveView: View {
         }
         .padding(.horizontal, 8)
         .frame(height: h)
+    }
+}
+
+/// Island fill. Collapsed (and with the black look) it's solid black so it merges with the
+/// camera housing. Expanded with the glass look: glass, darkened by the user's slider, with
+/// the top band still solid black where the notch is.
+struct IslandBackground: View {
+    let shape: NotchShape
+    let expanded: Bool
+    let notchHeight: CGFloat
+    let height: CGFloat
+    @AppStorage(ShelfLook.styleKey) private var style = ShelfLook.black
+    @AppStorage(ShelfLook.darknessKey) private var darkness = 0.55
+    @Environment(\.isSnapshot) private var isSnapshot
+
+    var body: some View {
+        if expanded, style == ShelfLook.glass {
+            let notchEnd = min(0.95, notchHeight / max(height, 1))
+            ZStack {
+                glass
+                shape.fill(LinearGradient(
+                    stops: [
+                        .init(color: .black, location: 0),
+                        .init(color: .black, location: notchEnd),
+                        .init(color: .black.opacity(darkness), location: min(1, notchEnd + 0.12)),
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                ))
+            }
+        } else {
+            shape.fill(Color.black)
+        }
+    }
+
+    @ViewBuilder
+    private var glass: some View {
+        if !isSnapshot, #available(macOS 26.0, *) {
+            Color.clear.glassEffect(.regular, in: shape)
+        } else {
+            shape.fill(Color(white: 0.16))
+        }
     }
 }
