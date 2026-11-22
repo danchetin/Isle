@@ -5,146 +5,159 @@
 <h1 align="center">Isle</h1>
 
 <p align="center">
-  Dynamic Island для выреза MacBook и экран блокировки со Spotify.<br>
-  Плеер, виджеты, буфер обмена, трей файлов и статус AI-агентов прямо в чёлке.
+  A Dynamic Island for the MacBook notch, plus a Spotify lock screen.<br>
+  Player, widgets, clipboard history, a file tray and live AI-agent status, right in the notch.
 </p>
 
 <p align="center">
-  <a href="../../releases/latest"><b>Скачать Isle</b></a> · macOS 15+ · Apple Silicon и Intel · бесплатно, MIT
+  <a href="../../releases/latest"><b>Download Isle</b></a> · macOS 15+ · Apple Silicon & Intel · free, MIT
+  <br>
+  <a href="README.ru.md">Русский</a>
 </p>
 
-![Экран блокировки](docs/lock-screen.jpg)
+![Lock screen](docs/lock-screen.jpg)
 
-## Возможности
+## Features
 
-### Экран блокировки
-- Обложка трека на весь экран, большие часы и плеер прямо на экране блокировки.
-- **Clock Depth**: объект с обложки встаёт поверх часов, как на iPhone.
-- Синхронизированные тексты песен ([LRCLIB](https://lrclib.net)).
-- Точки ввода пароля, чтобы видеть, что печатаешь.
-- Редактор: шрифт и цвет часов, стеклянные часы, ряд виджетов (погода, календарь, батареи, курсы, агенты), стиль плеера, фон.
+### Lock screen
+- Full-screen artwork, a big clock and a player, right on the lock screen.
+- **Clock Depth**: the subject of the cover art steps in front of the clock, like on iPhone.
+- Synced lyrics from [LRCLIB](https://lrclib.net).
+- Dots while you type your password, so you can see it's being entered.
+- Editor: clock font and color, a glass clock, a widget row (weather, calendar, batteries, rates, agents), player style, background.
 
-![Редактор экрана блокировки](docs/lock-editor.jpg)
+![Lock screen editor](docs/lock-editor.jpg)
 
-### Чёлка
-Наведи на вырез, и он раскроется в полку с виджетами. Колесом или свайпом листаются страницы, каждую можно собрать под себя.
+### Notch
+Hover the notch and it opens into a shelf of widgets. Scroll or swipe through pages, and lay out each one the way you like.
 
-![Полка: плеер, календарь, погода](docs/shelf.png)
+![Shelf: player, calendar, weather](docs/shelf.png)
 
-| Виджет | Что делает |
+| Widget | What it does |
 |---|---|
-| Плеер | Spotify: обложка, прогресс, управление, выбор устройства вывода, тексты |
-| Календарь, погода | события на сегодня, погода по [Open-Meteo](https://open-meteo.com) |
-| Система, батареи | CPU, GPU, RAM, диск, батарея Mac, AirPods и других Bluetooth-устройств |
-| Микшер | громкость отдельно для каждого приложения |
-| Буфер обмена | история копирования, ⌥⇧V открывает выбор где угодно |
-| Трей | перетащи файлы на чёлку, они полежат там, пока не понадобятся |
-| Курсы | валюты и крипта, ⌥⇧C открывает конвертер как в Spotlight |
-| Агенты | что делает Claude Code прямо сейчас, правки по файлам, лимиты плана |
+| Player | Spotify: artwork, progress, controls, output device, lyrics |
+| Calendar, Weather | today's events, weather from [Open-Meteo](https://open-meteo.com) |
+| System, Batteries | CPU, GPU, RAM, disk, the Mac's battery, AirPods and other Bluetooth devices |
+| Volume | per-app volume |
+| Clipboard | copy history, ⌥⇧V opens the picker anywhere |
+| Tray | drop files on the notch and they wait there until you need them |
+| Rates | currencies and crypto, ⌥⇧C opens a Spotlight-style converter |
+| Agents | what Claude Code is doing right now, per-file edits, plan limits |
 
-![Система и батареи](docs/stats.png)
-![Трей и буфер](docs/tray.png)
+![System and batteries](docs/stats.png)
+![Tray and clipboard](docs/tray.png)
 
-### И ещё
-- **HUD громкости и яркости** в стиле острова вместо системного.
-- **Агенты**: пока Claude Code работает, в чёлке живёт индикатор, а когда он закончил или ждёт ответа, показывается уведомление. Можно подключить Isle к Claude Code как MCP-сервер (каждый инструмент включается отдельно).
-- **Удаление фона**: перетащи картинку на чёлку, получишь PNG без фона в буфере.
-- **Чистка приложений**: удаляет приложение вместе с его хвостами в Library (в Корзину).
+### And also
+- **Volume and brightness HUD** in the island's style instead of the system one.
+- **Agents**: while Claude Code works, a live indicator sits in the notch. When it finishes or needs your input, you get a notification. Isle can also be added to Claude Code as an MCP server (each tool is opt-in).
+- **Background removal**: drop an image on the notch to get a PNG without its background on the clipboard.
+- **App uninstaller**: removes an app together with its leftovers in Library (to the Trash).
 
-![Агенты](docs/agents.png)
+![Agents](docs/agents.png)
 
-## Установка
+## Install
 
-1. Скачай `Isle-x.y.z.dmg` из [Releases](../../releases/latest).
-2. Открой DMG и перетащи **Isle** в **Applications**.
-3. Запусти Isle из Applications. В строке меню появится значок острова, через него все настройки.
+1. Download `Isle-x.y.z.dmg` from [Releases](../../releases/latest).
+2. Open the DMG and drag **Isle** into **Applications**.
+3. Launch Isle from Applications. An island icon appears in the menu bar, and everything is configured from there.
 
-> [!NOTE]
-> Если macOS пишет, что не может проверить приложение: **Системные настройки → Конфиденциальность и безопасность**, внизу **«Всё равно открыть»**. Это бывает со сборками без нотаризации Apple.
+### “Isle can't be opened” / “Apple could not verify Isle”
+Builds that aren't notarized by Apple are blocked by Gatekeeper on first launch. Either:
 
-### Разрешения
-Isle спрашивает их по мере надобности, ничего не нужно включать заранее.
+- **Terminal (fastest):** type `xattr -cr ` (with the trailing space), drag **Isle** from Applications into the Terminal window to paste its path, and press Return:
+  ```bash
+  xattr -cr /Applications/Isle.app
+  ```
+- **System Settings:** try to open Isle once, then go to **Privacy & Security**, scroll down and click **Open Anyway**.
 
-| Разрешение | Зачем |
+### Permissions
+Isle asks for each one when it's first needed. Nothing needs to be turned on in advance.
+
+| Permission | Why |
 |---|---|
-| Автоматизация → Spotify | читать текущий трек и управлять воспроизведением |
-| Универсальный доступ | HUD громкости и яркости (медиа-клавиши), точки ввода пароля |
-| Календари | события в виджете календаря |
-| Геолокация | погода там, где ты (координаты округляются до ~1 км) |
-| Bluetooth | заряд AirPods и других устройств |
-| Запись звука системы | микшер громкости по приложениям |
+| Automation → Spotify | read the current track and control playback |
+| Accessibility | volume/brightness HUD (media keys), password dots |
+| Calendars | events in the calendar widget |
+| Location | weather where you are (coordinates rounded to ~1 km) |
+| Bluetooth | battery level of AirPods and other devices |
+| System audio recording | per-app volume mixer |
 
-## Горячие клавиши
+## Shortcuts
 
 | | |
 |---|---|
-| ⌥⇧V | история буфера обмена |
-| ⌥⇧C | конвертер валют |
+| ⌥⇧V | clipboard history |
+| ⌥⇧C | currency converter |
 
-## Приватность
-Isle не собирает аналитику и ни с кем не делится данными. В сеть он ходит только за этим:
-- тексты песен: `lrclib.net` (название и исполнитель трека);
-- погода: `api.open-meteo.com` (округлённые координаты);
-- курсы валют: `cdn.jsdelivr.net` / `currency-api.pages.dev`;
-- лимиты Claude: `api.anthropic.com`, только если подключён Claude Code. Используется его же локальный токен из Связки ключей, и никуда больше он не уходит.
+## Language
+English and Russian. Isle follows the system language. To change it, use **Language** in the menu bar menu.
 
-Хуки Claude Code и MCP подключаются только вручную из меню Isle, и так же отключаются.
+## Privacy
+Isle has no analytics and shares nothing with anyone. It goes online only for:
+- lyrics: `lrclib.net` (track title and artist);
+- weather: `api.open-meteo.com` (rounded coordinates);
+- exchange rates: `cdn.jsdelivr.net` / `currency-api.pages.dev`;
+- Claude limits: `api.anthropic.com`, only when Claude Code is connected. Isle uses Claude Code's own local token from the Keychain and sends it nowhere else.
 
-## Сборка из исходников
+Claude Code hooks and the MCP server are only connected when you turn them on in the Isle menu, and you can turn them off there too.
 
-Нужны Xcode 26+ и [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+## Build from source
+
+Requires Xcode 26+ and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```bash
 brew install xcodegen
 git clone https://github.com/danchetin/isle.git && cd isle
-./scripts/install.sh      # Release → /Applications/Isle.app и запуск
+./scripts/install.sh      # Release build → /Applications/Isle.app, then launch
 ```
 
-Для своей сборки поменяй `DEVELOPMENT_TEAM` в `project.yml` на свой Team ID.
+For your own build, set `DEVELOPMENT_TEAM` in `project.yml` to your Team ID.
 
-Скрипт `./scripts/release.sh` собирает DMG в `build/dist`. Если в Связке ключей есть сертификат **Developer ID Application** и профиль `notarytool`, он подписывает и нотаризует DMG (подробности в шапке скрипта).
+`./scripts/release.sh` builds a universal DMG into `build/dist`. With a **Developer ID Application** certificate and a `notarytool` profile in the Keychain, it signs and notarizes it too (see the script's header).
 
 <details>
-<summary>Для разработки</summary>
+<summary>Development</summary>
 
 ```bash
 xcodegen generate
 xcodebuild -project Isle.xcodeproj -scheme Isle -configuration Debug -derivedDataPath build build
 ```
 
-Debug-сборка не запускается рядом с установленной копией и не трогает шимы хуков и MCP. Интерфейс удобно проверять без блокировки экрана:
+A Debug build won't run next to the installed copy and never takes over the hook / MCP shims. You can check the UI without locking the screen:
 
-| Флаг | Что делает |
+| Flag | What it does |
 |---|---|
-| `--snapshot <dir> [--art cover.jpg]` | рендерит экраны в PNG (`ISLE_SAMPLE=1` даёт только демо-данные) |
-| `--uitest` | кликает по редактору полки в невидимом окне |
-| `--probe` | поля Spotify через AppleScript |
-| `--remove-bg <in> <out>` | удаление фона |
-| `--clean-scan <app>` | пробный прогон чистки |
-| `--convert <запросы…>` | парсер конвертера на живых курсах |
-| `--hook <source>` / `--mcp` | форвардер хуков / MCP-сервер на stdio |
+| `--snapshot <dir> [--art cover.jpg]` | renders screens to PNG (`ISLE_SAMPLE=1` = demo data only, `-AppleLanguages "(en)"` picks the language) |
+| `--uitest` | clicks through the shelf editor in an invisible window |
+| `--probe` | Spotify fields via AppleScript |
+| `--remove-bg <in> <out>` | background removal |
+| `--clean-scan <app>` | uninstaller dry run |
+| `--convert <queries…>` | converter parser against live rates |
+| `--hook <source>` / `--mcp` | hook forwarder / MCP stdio server |
 
-| Часть | Где | Как |
+UI strings are English in code; Russian lives in `Isle/Resources/Localizable.xcstrings`.
+
+| Part | Where | How |
 |---|---|---|
-| Spotify | `Spotify/` | уведомление `PlaybackStateChanged` + AppleScript, позиция интерполируется |
-| Экран блокировки | `LockScreen/SkyLight.swift` | приватный SkyLight space над экраном блокировки |
-| Clock Depth | `Media/ArtworkProcessor.swift` | маска переднего плана из Vision |
-| Чёлка | `Notch/`, `Shelf/` | неактивирующая панель над вырезом |
-| Агенты | `Agents/` | хуки Claude Code → локальный Unix-сокет, MCP на stdio |
-| Микшер | `Audio/` | CoreAudio process taps |
+| Spotify | `Spotify/` | `PlaybackStateChanged` notification + AppleScript, position interpolated |
+| Lock screen | `LockScreen/SkyLight.swift` | private SkyLight space above the lock screen |
+| Clock Depth | `Media/ArtworkProcessor.swift` | Vision foreground mask |
+| Notch | `Notch/`, `Shelf/` | non-activating panel over the notch |
+| Agents | `Agents/` | Claude Code hooks → local Unix socket, MCP over stdio |
+| Volume mixer | `Audio/` | CoreAudio process taps |
 
 </details>
 
-## Ограничения
-- Экран блокировки и яркость работают через приватные API macOS (SkyLight, DisplayServices). Обновление системы может что-то сломать.
-- Из музыкальных сервисов поддерживается только Spotify.
-- Интерфейс только на русском.
+## Limitations
+- The lock screen and brightness rely on private macOS APIs (SkyLight, DisplayServices), so a system update can break them.
+- Spotify is the only supported music service.
+- The currency converter treats amounts without a currency as Armenian dram (AMD).
 
-## Благодарности
-- [SkyLightWindow](https://github.com/Lakr233/SkyLightWindow) от Lakr Aream: техника окна над экраном блокировки (MIT, см. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)).
+## Credits
+- [SkyLightWindow](https://github.com/Lakr233/SkyLightWindow) by Lakr Aream: the technique for a window above the lock screen (MIT, see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)).
 - [LRCLIB](https://lrclib.net), [Open-Meteo](https://open-meteo.com), [fawazahmed0/exchange-api](https://github.com/fawazahmed0/exchange-api).
 
-Isle не связан со Spotify, Apple или Anthropic. Названия принадлежат их владельцам.
+Isle isn't affiliated with Spotify, Apple or Anthropic. All names belong to their owners.
 
-## Лицензия
+## License
 [MIT](LICENSE)
