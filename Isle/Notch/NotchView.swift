@@ -84,7 +84,6 @@ struct NotchRootView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .animation(spring, value: model.expanded)
         .animation(spring, value: model.editing)
-        .animation(.spring(response: 0.45, dampingFraction: 0.86), value: model.page)
         .animation(spring, value: model.pageCount)
         .animation(spring, value: model.visibleWidgets)
         .animation(spring, value: model.draftSizes)

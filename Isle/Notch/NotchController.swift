@@ -47,11 +47,15 @@ final class NotchModel: ObservableObject {
 
     var visibleWidgets: [ShelfWidget] { editing ? draft : widgets }
 
+    /// Two steps: set the direction first (no animation) so the outgoing page re-renders
+    /// with the right slide, then change the page animated on the next turn of the run loop.
     func goToPage(_ target: Int) {
         let p = max(0, min(target, pageCount - 1))
         guard p != page else { return }
         pageDirection = p > page ? 1 : -1
-        page = p
+        DispatchQueue.main.async {
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.88)) { self.page = p }
+        }
     }
 
     /// Page (while editing) a widget sits on, if any.
@@ -146,7 +150,8 @@ enum NotchMetrics {
     static let emptyHeight: CGFloat = 90
     static let cardGap: CGFloat = 12
     static let shelfPad: CGFloat = 16
-    static let paletteHeight: CGFloat = 86
+    /// Two rows of widget tiles + spacing.
+    static let paletteHeight: CGFloat = 150
     /// Tab bar pill below the island (pill + gap).
     static let tabBarHeight: CGFloat = 50
 
@@ -370,9 +375,7 @@ final class NotchController {
         let forward = scrollAccum < 0 // wheel down / swipe up or left → next page
         scrollAccum = 0
         scrollLocked = true
-        withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) {
-            model.goToPage(model.page + (forward ? 1 : -1))
-        }
+        model.goToPage(model.page + (forward ? 1 : -1))
     }
 
     // MARK: - File drag → drop zone

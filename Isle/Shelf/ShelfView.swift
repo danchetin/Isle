@@ -15,7 +15,9 @@ struct ShelfView: View {
         let list = model.visibleWidgets
         VStack(spacing: 0) {
             Color.clear.frame(height: model.notchSize.height + 6)
-            pager(current: list)
+            pageContent(list)
+                .id(model.page)
+                .transition(pageTransition)
             if model.editing {
                 ShelfPalette(model: model)
                     .padding(.top, 14)
@@ -26,22 +28,14 @@ struct ShelfView: View {
         .padding(.bottom, NotchMetrics.shelfPad)
     }
 
-    /// All pages stacked in one vertical strip; the strip slides so the current page shows.
-    /// Next page sits below, previous above — the motion always follows the scroll.
-    private func pager(current: [ShelfWidget]) -> some View {
-        let all = model.editing ? model.draftPages : model.pages
-        let step = NotchMetrics.cardHeight + 40
-        return ZStack(alignment: .top) {
-            ForEach(Array(all.indices), id: \.self) { i in
-                pageContent(i == model.page ? current : all[i])
-                    .offset(y: CGFloat(i - model.page) * step)
-                    .opacity(i == model.page ? 1 : 0.35)
-                    .allowsHitTesting(i == model.page)
-            }
-        }
-        .frame(height: current.isEmpty ? NotchMetrics.emptyHeight : NotchMetrics.cardHeight, alignment: .top)
-        .frame(maxWidth: .infinity)
-        .clipped()
+    /// Next page comes from below, previous from above; the outgoing page leaves the
+    /// opposite way. Direction is set a frame before the page changes (see goToPage).
+    private var pageTransition: AnyTransition {
+        let forward = model.pageDirection > 0
+        return .asymmetric(
+            insertion: .move(edge: forward ? .bottom : .top).combined(with: .opacity),
+            removal: .move(edge: forward ? .top : .bottom).combined(with: .opacity)
+        )
     }
 
     @ViewBuilder
@@ -248,7 +242,8 @@ private struct ShelfPalette: View {
     @ObservedObject var model: NotchModel
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(alignment: .center, spacing: 10) {
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(58), spacing: 10), count: 6), alignment: .leading, spacing: 8) {
             ForEach(ShelfWidget.allCases) { widget in
                 let on = model.draft.contains(widget)
                 let elsewhere = on ? nil : model.pageOf(widget)
@@ -293,6 +288,8 @@ private struct ShelfPalette: View {
                 .help(!fits ? "Не помещается — убери другой виджет"
                       : elsewhere.map { "На странице \($0 + 1) — нажми, чтобы перенести сюда" } ?? widget.title)
             }
+            }
+            .frame(width: 6 * 58 + 5 * 10, alignment: .leading)
             Spacer()
             pageButton("plus.rectangle.on.rectangle", help: "Новая страница") { model.addPage() }
             if model.pageCount > 1 {
@@ -347,7 +344,7 @@ struct ShelfTabBar: View {
                 Capsule().fill(Color.white.opacity(0.2)).frame(width: 1, height: 18).padding(.horizontal, 4)
                 ForEach(0..<model.pageCount, id: \.self) { i in
                     Button {
-                        withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) { model.goToPage(i) }
+                        model.goToPage(i)
                     } label: {
                         Circle()
                             .fill(Color.white.opacity(i == model.page ? 0.95 : 0.3))
