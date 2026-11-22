@@ -43,6 +43,20 @@ enum SnapshotRunner {
             let screen = NSScreen.screens.first?.frame.size ?? CGSize(width: 1470, height: 956)
             render(LockScreenView(spotify: spotify, onClose: {}), size: screen, name: "lock.png", dir: outDir)
             render(LockScreenView(spotify: spotify, onClose: {}, showLyrics: true), size: screen, name: "lock-lyrics.png", dir: outDir)
+            // Customized lock screen: widgets row, compact player, editor open. Settings restored after.
+            let defaults = UserDefaults.standard
+            let saved = [LockKey.widgets, LockKey.player, LockKey.clockFont].map { defaults.string(forKey: $0) }
+            injectShelfSamples()
+            BatteryService.shared.refresh(bluetooth: false)
+            defaults.set("weather,calendar,batteries,currency", forKey: LockKey.widgets)
+            defaults.set(LockPlayerStyle.compact.rawValue, forKey: LockKey.player)
+            defaults.set(LockClockFont.rounded.rawValue, forKey: LockKey.clockFont)
+            render(LockScreenView(spotify: spotify, onClose: {}, editable: true), size: screen, name: "lock-custom.png", dir: outDir)
+            render(LockScreenView(spotify: spotify, onClose: {}, editable: true, startEditing: true), size: screen, name: "lock-editor.png", dir: outDir)
+            for (key, value) in zip([LockKey.widgets, LockKey.player, LockKey.clockFont], saved) {
+                if let value { defaults.set(value, forKey: key) } else { defaults.removeObject(forKey: key) }
+            }
+
             let typing = PasswordInputMonitor()
             typing.debugSet(count: 7)
             render(LockScreenView(spotify: spotify, input: typing, onClose: {}), size: screen, name: "lock-typing.png", dir: outDir)

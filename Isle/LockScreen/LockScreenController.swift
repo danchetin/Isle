@@ -131,9 +131,14 @@ final class LockScreenController {
         if isPreview { closePreview() } else { openPreview() }
     }
 
-    private func openPreview() {
+    func openEditor() {
+        if isPreview { closePreview() }
+        openPreview(editing: true)
+    }
+
+    private func openPreview(editing: Bool = false) {
         guard panel == nil, let screen = NSScreen.screens.first else { return }
-        let p = makePanel(screen: screen, keyable: true) { [weak self] in
+        let p = makePanel(screen: screen, keyable: true, editing: editing) { [weak self] in
             self?.closePreview()
         }
         p.level = .screenSaver
@@ -161,7 +166,7 @@ final class LockScreenController {
 
     // MARK: - Window
 
-    private func makePanel(screen: NSScreen, keyable: Bool, onClose: @escaping () -> Void) -> OverlayPanel {
+    private func makePanel(screen: NSScreen, keyable: Bool, editing: Bool = false, onClose: @escaping () -> Void) -> OverlayPanel {
         let p = OverlayPanel(
             contentRect: screen.frame,
             styleMask: [.borderless, .nonactivatingPanel],
@@ -178,7 +183,8 @@ final class LockScreenController {
         p.canBecomeVisibleWithoutLogin = true
         p.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]
 
-        let host = FirstMouseHostingView(rootView: LockScreenView(spotify: spotify, input: passwordInput, onClose: onClose))
+        let host = FirstMouseHostingView(rootView: LockScreenView(spotify: spotify, input: passwordInput, onClose: onClose,
+                                                                  editable: keyable, startEditing: editing))
         host.sizingOptions = []
         p.contentView = host
         p.setFrame(screen.frame, display: false)

@@ -43,6 +43,8 @@ Private APIs (SkyLight) can break with macOS updates.
 4. ✅ Coding agents (Claude Code hooks → local socket), MCP server (`Isle --mcp`, per-tool opt-in),
    background removal (drop on the notch → PNG on clipboard), Cleaner (app + leftovers → Trash),
    per-app volume (CoreAudio process taps)
+   + shelf pages (scroll / swipe), clipboard history (⌥⇧V), file tray, currency widget + converter (⌥⇧C),
+   lock screen editor (clock font / colour, widgets row, player style, background)
 5. iPhone companion: send to Mac clipboard, shared clipboard, Mac widgets, agent Live Activity
 
 ## Debug entry points
@@ -56,4 +58,5 @@ Private APIs (SkyLight) can break with macOS updates.
 | `--clean-scan <app>` | Cleaner dry run |
 | `--install-hooks` | add Claude Code hooks |
 | `--hook <source>` / `--mcp` | hook forwarder / MCP stdio server |
+| `--convert <queries…>` | currency parser against live rates |
 | `--mixer-selftest` (via `open --args`) | tap the playing app at 50% for 4 s, log to ~/Library/Logs/Isle/lock.log |

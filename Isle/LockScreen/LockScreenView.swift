@@ -7,8 +7,16 @@ struct LockScreenView: View {
     @ObservedObject var spotify: SpotifyController
     var input: PasswordInputMonitor?
     var onClose: () -> Void
+    /// Preview only: shows the ⚙︎ button and the editor panel.
+    var editable = false
+    @State private var editing: Bool
     /// Remembered across locks.
-    @AppStorage("lockShowLyrics") private var storedShowLyrics = false
+    @AppStorage(LockKey.lyrics) private var storedShowLyrics = false
+    @AppStorage(LockKey.clockFont) private var clockFontRaw = LockClockFont.regular.rawValue
+    @AppStorage(LockKey.clockColor) private var clockColorRaw = LockClockColor.white.rawValue
+    @AppStorage(LockKey.player) private var playerRaw = LockPlayerStyle.full.rawValue
+    @AppStorage(LockKey.background) private var backgroundRaw = LockBackground.artwork.rawValue
+    @AppStorage(LockKey.widgets) private var widgetsRaw = ""
     /// Snapshot override.
     private let forcedLyrics: Bool?
     private var showLyrics: Bool { forcedLyrics ?? storedShowLyrics }
@@ -16,11 +24,21 @@ struct LockScreenView: View {
     @AppStorage(PrefKey.clockDepth) private var clockDepth = true
     @AppStorage(PrefKey.clockStyle) private var clockStyleRaw = ClockStyle.large.rawValue
 
-    init(spotify: SpotifyController, input: PasswordInputMonitor? = nil, onClose: @escaping () -> Void, showLyrics: Bool? = nil) {
+    init(spotify: SpotifyController, input: PasswordInputMonitor? = nil, onClose: @escaping () -> Void,
+         showLyrics: Bool? = nil, editable: Bool = false, startEditing: Bool = false) {
         self.spotify = spotify
         self.input = input
         self.onClose = onClose
+        self.editable = editable
+        _editing = State(initialValue: startEditing)
         forcedLyrics = showLyrics
+    }
+
+    private var playerStyle: LockPlayerStyle { LockPlayerStyle(rawValue: playerRaw) ?? .full }
+    private var blurredOnly: Bool { backgroundRaw == LockBackground.blurred.rawValue }
+    private var clockColor: Color {
+        guard clockColorRaw == LockClockColor.accent.rawValue, let accent = spotify.artwork?.accent else { return .white }
+        return Color(nsColor: accent)
     }
 
     var body: some View {
@@ -28,37 +46,66 @@ struct LockScreenView: View {
             let size = geo.size
             let style = ClockStyle(rawValue: clockStyleRaw) ?? .large
             ZStack {
-                ArtBackdrop(artwork: spotify.artwork, size: size)
-                LockClock(style: style, size: size)
-                if clockDepth, let artwork = spotify.artwork, let subject = artwork.subject {
+                ArtBackdrop(artwork: spotify.artwork, size: size, blurredOnly: blurredOnly)
+                LockClock(style: style, size: size, font: LockClockFont(rawValue: clockFontRaw) ?? .regular, color: clockColor)
+                if clockDepth, !blurredOnly, let artwork = spotify.artwork, let subject = artwork.subject {
                     SubjectLayer(image: subject, size: size)
                         .id(artwork.url)
                         .transition(.opacity)
                 }
+                let widgets = LockWidget.decode(widgetsRaw)
+                if !widgets.isEmpty {
+                    LockWidgetsRow(widgets: widgets)
+                        .padding(.top, size.height * (style == .large ? 0.3 : 0.17))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                        .transition(.opacity)
+                }
                 controls(size: size)
+                if editing {
+                    LockEditorPanel { withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) { editing = false } }
+                        .padding(.top, 24)
+                        .padding(.trailing, 24)
+                        .padding(.bottom, 96) // keep the ⚙︎ / lyrics buttons below it reachable
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
+                }
             }
             .frame(width: size.width, height: size.height)
             .clipped()
             .animation(.easeInOut(duration: 0.7), value: spotify.artwork?.url)
+            .animation(.spring(response: 0.45, dampingFraction: 0.86), value: widgetsRaw)
+            .animation(.spring(response: 0.45, dampingFraction: 0.86), value: playerRaw)
+            .animation(.easeInOut(duration: 0.4), value: backgroundRaw)
         }
         .ignoresSafeArea()
         .environment(\.colorScheme, .dark)
     }
 
     private func controls(size: CGSize) -> some View {
-        let playerWidth = min(showLyrics ? 560 : 640, size.width * (showLyrics ? 0.38 : 0.42))
+        let lyricsOn = showLyrics && playerStyle == .full
+        let playerWidth = min(lyricsOn ? 560 : 640, size.width * (lyricsOn ? 0.38 : 0.42))
         return ZStack(alignment: .bottom) {
-            HStack(alignment: .bottom, spacing: size.width * 0.07) {
-                LockPlayer(spotify: spotify)
-                    .frame(width: playerWidth)
-                if showLyrics {
-                    LockLyrics(spotify: spotify)
-                        .frame(width: playerWidth, height: size.height * 0.46)
-                        .transition(.opacity.combined(with: .move(edge: .trailing)))
+            switch playerStyle {
+            case .full:
+                HStack(alignment: .bottom, spacing: size.width * 0.07) {
+                    LockPlayer(spotify: spotify)
+                        .frame(width: playerWidth)
+                    if lyricsOn {
+                        LockLyrics(spotify: spotify)
+                            .frame(width: playerWidth, height: size.height * 0.46)
+                            .transition(.opacity.combined(with: .move(edge: .trailing)))
+                    }
                 }
+                .padding(.bottom, size.height * 0.115)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            case .compact:
+                LockCompactPlayer(spotify: spotify)
+                    .padding(.bottom, size.height * 0.11)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            case .hidden:
+                EmptyView()
             }
-            .padding(.bottom, size.height * 0.115)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
 
             HStack(alignment: .bottom) {
                 Image(systemName: spotify.output.symbol)
@@ -69,6 +116,12 @@ struct LockScreenView: View {
                     .help(spotify.output.name)
                 Spacer()
                 HStack(spacing: 2) {
+                    if editable {
+                        IconButton(systemName: "slider.horizontal.3", size: 15, opacity: editing ? 1 : 0.75) {
+                            withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) { editing.toggle() }
+                        }
+                        .help("Настроить экран блокировки")
+                    }
                     IconButton(systemName: "quote.bubble", size: 16, opacity: showLyrics ? 1 : 0.75) {
                         storedShowLyrics.toggle()
                     }
@@ -83,7 +136,7 @@ struct LockScreenView: View {
             .padding(.horizontal, 36)
             .padding(.bottom, 30)
 
-            if let input {
+            if let input, !editing {
                 PasswordIndicator(input: input)
                     .padding(.bottom, 33)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
@@ -143,6 +196,7 @@ private struct FillImage: View {
 struct ArtBackdrop: View {
     let artwork: ProcessedArtwork?
     let size: CGSize
+    var blurredOnly = false
 
     var body: some View {
         ZStack {
@@ -150,8 +204,10 @@ struct ArtBackdrop: View {
             if let artwork {
                 ZStack {
                     FillImage(image: artwork.blurred, size: size)
-                    FillImage(image: artwork.image, size: size)
-                        .mask(ArtMask(size: size))
+                    if !blurredOnly {
+                        FillImage(image: artwork.image, size: size)
+                            .mask(ArtMask(size: size))
+                    }
                 }
                 .id(artwork.url)
                 .transition(.opacity)
@@ -184,6 +240,8 @@ private struct SubjectLayer: View {
 struct LockClock: View {
     let style: ClockStyle
     let size: CGSize
+    var font: LockClockFont = .regular
+    var color: Color = .white
 
     var body: some View {
         TimelineView(.everyMinute) { ctx in
@@ -193,21 +251,21 @@ struct LockClock: View {
                 case .large:
                     VStack(spacing: -size.height * 0.012) {
                         Text(date, format: .dateTime.weekday(.wide).day().month(.wide))
-                            .font(.system(size: size.height * 0.027, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.85))
+                            .font(.system(size: size.height * 0.027, weight: .semibold, design: font.design))
+                            .foregroundStyle(color.opacity(0.85))
                         Text(Self.time(date))
-                            .font(.system(size: size.height * 0.2, weight: .bold))
+                            .font(.system(size: size.height * 0.2, weight: font.weight, design: font.design))
                             .tracking(-size.height * 0.004)
-                            .foregroundStyle(.white.opacity(0.93))
+                            .foregroundStyle(color.opacity(0.93))
                     }
                 case .inline:
                     HStack(alignment: .firstTextBaseline, spacing: size.height * 0.016) {
                         Text(Self.time(date))
-                            .font(.system(size: size.height * 0.05, weight: .bold))
-                            .foregroundStyle(.white)
+                            .font(.system(size: size.height * 0.05, weight: font.weight, design: font.design))
+                            .foregroundStyle(color)
                         Text(date, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
-                            .font(.system(size: size.height * 0.05, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.72))
+                            .font(.system(size: size.height * 0.05, weight: .semibold, design: font.design))
+                            .foregroundStyle(color.opacity(0.72))
                     }
                 }
             }

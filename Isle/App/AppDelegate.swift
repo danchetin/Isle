@@ -97,6 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
 
         menu.addItem(item("Превью lock screen", #selector(previewLock), key: "l"))
+        menu.addItem(item("Настроить lock screen…", #selector(editLock)))
         menu.addItem(item("Удалить приложение…", #selector(openCleaner)))
         let clip = item("История буфера", #selector(openClipboard), key: "v")
         clip.keyEquivalentModifierMask = [.option, .shift]
@@ -153,6 +154,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func previewLock() { lock.togglePreview() }
+    @objc private func editLock() { lock.openEditor() }
     @objc private func openCleaner() { CleanerWindows.chooseApp() }
     @objc private func openClipboard() { ClipboardPicker.shared.toggle() }
     @objc private func openConverter() { CurrencyConverterPanel.shared.toggle() }
