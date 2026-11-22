@@ -231,6 +231,82 @@ func round2A(_ c: CGContext) { glassBackground(c); notchIsland(c, content: .artW
 func round2B(_ c: CGContext) { glassBackground(c); notchIsland(c, content: .monoDot, shadow: rgb(0x3B2A7A, 0.45), rim: false) }
 func round2C(_ c: CGContext) { monoBackground(c); notchIsland(c, content: .artWave, shadow: rgb(0x000000, 0.75), rim: true) }
 
+
+// MARK: - Round 3: refined 6b island
+
+/// Island hanging from the top edge with smooth flared "ears" (cubic, tangent to the top
+/// edge) and continuous bottom corners. `x0…x1` are the vertical sides, `bottom` the lowest y.
+func smoothNotch(x0: CGFloat, x1: CGFloat, bottom: CGFloat, ear: CGFloat, radius b: CGFloat) -> CGPath {
+    let top = S + 2 // just past the top edge (clipped by the icon)
+    let p = CGMutablePath()
+    p.move(to: CGPoint(x: x0 - ear, y: top))
+    // left ear: flat along the top edge, then curling down into the side wall
+    p.addCurve(to: CGPoint(x: x0, y: top - ear * 1.1),
+               control1: CGPoint(x: x0 - ear * 0.35, y: top),
+               control2: CGPoint(x: x0, y: top - ear * 0.4))
+    p.addLine(to: CGPoint(x: x0, y: bottom + b))
+    // continuous ("squircle") bottom-left corner
+    p.addCurve(to: CGPoint(x: x0 + b, y: bottom),
+               control1: CGPoint(x: x0, y: bottom + b * 0.28),
+               control2: CGPoint(x: x0 + b * 0.28, y: bottom))
+    p.addLine(to: CGPoint(x: x1 - b, y: bottom))
+    p.addCurve(to: CGPoint(x: x1, y: bottom + b),
+               control1: CGPoint(x: x1 - b * 0.28, y: bottom),
+               control2: CGPoint(x: x1, y: bottom + b * 0.28))
+    p.addLine(to: CGPoint(x: x1, y: top - ear * 1.1))
+    p.addCurve(to: CGPoint(x: x1 + ear, y: top),
+               control1: CGPoint(x: x1, y: top - ear * 0.4),
+               control2: CGPoint(x: x1 + ear * 0.35, y: top))
+    p.closeSubpath()
+    return p
+}
+
+func refinedIsland(_ c: CGContext, halfWidth: CGFloat, ear: CGFloat) {
+    glassBackground(c)
+    let x0 = S / 2 - halfWidth, x1 = S / 2 + halfWidth
+    let bottom = S * 0.54
+    let radius = S * 0.15
+    let path = smoothNotch(x0: x0, x1: x1, bottom: bottom, ear: ear, radius: radius)
+    // soft coloured shadow under the island
+    c.saveGState()
+    c.setShadow(offset: CGSize(width: 0, height: -26), blur: 70, color: rgb(0x3B2A7A, 0.5))
+    c.addPath(path); c.setFillColor(rgb(0x030305)); c.fillPath()
+    c.restoreGState()
+    // glossy black: a hair lighter towards the bottom, plus a thin lower rim light
+    c.saveGState()
+    c.addPath(path); c.clip()
+    c.drawLinearGradient(gradient([rgb(0x020204), rgb(0x0B0B10), rgb(0x16161D)], [0, 0.65, 1]),
+                         start: CGPoint(x: 0, y: S), end: CGPoint(x: 0, y: bottom), options: [])
+    c.addPath(path); c.setStrokeColor(rgb(0xFFFFFF, 0.1)); c.setLineWidth(5); c.strokePath()
+    c.restoreGState()
+
+    // content: white waveform left, glowing warm dot right — sized to the island
+    let inner = (x1 - x0)
+    let rowH = S * 0.11
+    let rowY = bottom + S * 0.085
+    bars(c, in: CGRect(x: x0 + inner * 0.13, y: rowY, width: inner * 0.42, height: rowH),
+         heights: [0.45, 0.85, 1.0, 0.6, 0.8], colors: [rgb(0xFFFFFF, 0.96), rgb(0xFFFFFF, 0.72)])
+    let d = rowH * 0.78
+    let dot = CGRect(x: x1 - inner * 0.13 - d, y: rowY + (rowH - d) / 2, width: d, height: d)
+    c.saveGState()
+    c.addEllipse(in: dot)
+    c.clip()
+    c.drawRadialGradient(gradient([rgb(0xFFB070), rgb(0xFF6A2B)]), startCenter: CGPoint(x: dot.midX - d * 0.15, y: dot.midY + d * 0.2), startRadius: 0,
+                         endCenter: CGPoint(x: dot.midX, y: dot.midY), endRadius: d * 0.6, options: [.drawsAfterEndLocation])
+    c.restoreGState()
+    // glow halo for the dot, kept inside the island so it doesn't muddy the glass
+    c.saveGState()
+    c.addPath(path); c.clip()
+    c.drawRadialGradient(gradient([rgb(0xFF7A3D, 0.4), rgb(0xFF7A3D, 0)]), startCenter: CGPoint(x: dot.midX, y: dot.midY), startRadius: d * 0.45,
+                         endCenter: CGPoint(x: dot.midX, y: dot.midY), endRadius: d * 1.5, options: [])
+    c.restoreGState()
+}
+
+/// Narrow, like a real MacBook notch: the ears land on the straight part of the top edge.
+func round3Narrow(_ c: CGContext) { refinedIsland(c, halfWidth: S * 0.22, ear: S * 0.075) }
+/// A bit wider, ears reaching towards the corner curve.
+func round3Wide(_ c: CGContext) { refinedIsland(c, halfWidth: S * 0.28, ear: S * 0.07) }
+
 // MARK: - Output
 
 func render(_ size: CGFloat, mac: Bool, _ draw: (CGContext) -> Void) -> Data {
@@ -266,6 +342,7 @@ let concepts: [(String, (CGContext) -> Void)] = [
     ("1-night-island", nightIsland), ("2-glass", glassIsland), ("3-sunset-notch", sunsetNotch), ("4-mono", mono),
     ("5a-night-notch", hybridA), ("5b-twilight-notch", hybridB), ("5c-twilight-notch-art", hybridC),
     ("6a-glass-notch-art", round2A), ("6b-glass-notch-mono", round2B), ("6c-mono-notch-art", round2C),
+    ("7a-glass-notch-narrow", round3Narrow), ("7b-glass-notch-wide", round3Wide),
 ]
 for (name, draw) in concepts {
     try! render(1024, mac: true, draw).write(to: out.appendingPathComponent("\(name)-mac.png"))
