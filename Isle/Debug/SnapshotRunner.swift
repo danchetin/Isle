@@ -53,6 +53,12 @@ enum SnapshotRunner {
             defaults.set(LockClockFont.rounded.rawValue, forKey: LockKey.clockFont)
             render(LockScreenView(spotify: spotify, onClose: {}, editable: true), size: screen, name: "lock-custom.png", dir: outDir)
             render(LockScreenView(spotify: spotify, onClose: {}, editable: true, startEditing: true), size: screen, name: "lock-editor.png", dir: outDir)
+            let savedColor = defaults.string(forKey: LockKey.clockColor)
+            defaults.set(LockClockColor.glass.rawValue, forKey: LockKey.clockColor)
+            defaults.set("", forKey: LockKey.widgets)
+            defaults.set(LockPlayerStyle.full.rawValue, forKey: LockKey.player)
+            render(LockScreenView(spotify: spotify, onClose: {}), size: screen, name: "lock-glass.png", dir: outDir)
+            if let savedColor { defaults.set(savedColor, forKey: LockKey.clockColor) } else { defaults.removeObject(forKey: LockKey.clockColor) }
             for (key, value) in zip([LockKey.widgets, LockKey.player, LockKey.clockFont], saved) {
                 if let value { defaults.set(value, forKey: key) } else { defaults.removeObject(forKey: key) }
             }

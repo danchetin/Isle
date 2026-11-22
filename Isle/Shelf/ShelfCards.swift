@@ -32,7 +32,7 @@ struct NowPlayingCard: View {
                         Text(track.name)
                             .font(.system(size: 15, weight: .semibold))
                             .lineLimit(1)
-                        if spotify.lyrics?.synced == true {
+                        if spotify.lyrics != nil || showLyrics {
                             Button { showLyrics.toggle() } label: {
                                 Text("L")
                                     .font(.system(size: 10, weight: .heavy))
@@ -71,6 +71,9 @@ struct NowPlayingCard: View {
                 }
                 .frame(maxHeight: .infinity)
                 .clipped()
+                .contentShape(Rectangle())
+                .onTapGesture { showLyrics = false } // always a way back to the controls
+                .help("Нажми, чтобы скрыть текст")
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             } else {
                 VStack(spacing: 6) {

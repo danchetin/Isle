@@ -47,7 +47,12 @@ struct LockScreenView: View {
             let style = ClockStyle(rawValue: clockStyleRaw) ?? .large
             ZStack {
                 ArtBackdrop(artwork: spotify.artwork, size: size, blurredOnly: blurredOnly)
-                LockClock(style: style, size: size, font: LockClockFont(rawValue: clockFontRaw) ?? .regular, color: clockColor)
+                let font = LockClockFont(rawValue: clockFontRaw) ?? .regular
+                if clockColorRaw == LockClockColor.glass.rawValue, let artwork = spotify.artwork {
+                    GlassClock(style: style, size: size, font: font, artwork: artwork)
+                } else {
+                    LockClock(style: style, size: size, font: font, color: clockColor)
+                }
                 if clockDepth, !blurredOnly, let artwork = spotify.artwork, let subject = artwork.subject {
                     SubjectLayer(image: subject, size: size)
                         .id(artwork.url)
@@ -236,6 +241,38 @@ private struct SubjectLayer: View {
 }
 
 // MARK: - Clock
+
+/// Liquid-glass digits, like the macOS 26 lock screen: the glyphs show the backdrop
+/// behind them blurred, brightened and more saturated, with a soft top sheen and a
+/// faint white body, plus a lift shadow.
+struct GlassClock: View {
+    let style: ClockStyle
+    let size: CGSize
+    let font: LockClockFont
+    let artwork: ProcessedArtwork
+
+    var body: some View {
+        let glyphs = LockClock(style: style, size: size, font: font, color: .white)
+        ZStack {
+            FillImage(image: artwork.blurred, size: size)
+                .brightness(0.12)
+                .saturation(1.6)
+            LinearGradient(
+                stops: [
+                    .init(color: .white.opacity(0.42), location: 0),
+                    .init(color: .white.opacity(0.12), location: 0.28),
+                    .init(color: .white.opacity(0.04), location: 0.6),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+        .mask(glyphs)
+        .overlay(glyphs.opacity(0.1).blendMode(.plusLighter))
+        .shadow(color: .black.opacity(0.28), radius: 12, y: 3)
+        .allowsHitTesting(false)
+    }
+}
 
 struct LockClock: View {
     let style: ClockStyle

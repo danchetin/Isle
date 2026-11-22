@@ -47,15 +47,12 @@ final class NotchModel: ObservableObject {
 
     var visibleWidgets: [ShelfWidget] { editing ? draft : widgets }
 
-    /// Two steps: set the direction first (no animation) so the outgoing page re-renders
-    /// with the right slide, then change the page animated on the next turn of the run loop.
+    /// The slide itself is animated by ShelfView; only the island's size animates here.
     func goToPage(_ target: Int) {
         let p = max(0, min(target, pageCount - 1))
         guard p != page else { return }
         pageDirection = p > page ? 1 : -1
-        DispatchQueue.main.async {
-            withAnimation(.spring(response: 0.42, dampingFraction: 0.88)) { self.page = p }
-        }
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.9)) { page = p }
     }
 
     /// Page (while editing) a widget sits on, if any.

@@ -13,11 +13,24 @@ struct ShelfView: View {
 
     var body: some View {
         let list = model.visibleWidgets
+        let all = model.editing ? model.draftPages : model.pages
+        let step = NotchMetrics.cardHeight + 48
         VStack(spacing: 0) {
             Color.clear.frame(height: model.notchSize.height + 6)
-            pageContent(list)
-                .id(model.page)
-                .transition(pageTransition)
+            // Every page stays mounted in one vertical strip (stable ids, nothing inserted or
+            // removed), positioned at (index − page) × step. Changing the page animates that one
+            // number, so all pages always move the same way. Off-page cards are transparent and
+            // inert; the island's own shape does the clipping.
+            ZStack(alignment: .top) {
+                ForEach(Array(all.indices), id: \.self) { i in
+                    pageContent(i == model.page ? list : all[i])
+                        .offset(y: CGFloat(i - model.page) * step)
+                        .opacity(i == model.page ? 1 : 0)
+                        .allowsHitTesting(i == model.page)
+                }
+            }
+            .frame(height: list.isEmpty ? NotchMetrics.emptyHeight : NotchMetrics.cardHeight, alignment: .top)
+            .frame(maxWidth: .infinity)
             if model.editing {
                 ShelfPalette(model: model)
                     .padding(.top, 14)
@@ -28,15 +41,6 @@ struct ShelfView: View {
         .padding(.bottom, NotchMetrics.shelfPad)
     }
 
-    /// Next page comes from below, previous from above; the outgoing page leaves the
-    /// opposite way. Direction is set a frame before the page changes (see goToPage).
-    private var pageTransition: AnyTransition {
-        let forward = model.pageDirection > 0
-        return .asymmetric(
-            insertion: .move(edge: forward ? .bottom : .top).combined(with: .opacity),
-            removal: .move(edge: forward ? .top : .bottom).combined(with: .opacity)
-        )
-    }
 
     @ViewBuilder
     private func pageContent(_ list: [ShelfWidget]) -> some View {

@@ -19,8 +19,8 @@ enum LockClockFont: String, CaseIterable {
 }
 
 enum LockClockColor: String, CaseIterable {
-    case white, accent
-    var title: String { self == .white ? "Белый" : "Из обложки" }
+    case white, accent, glass
+    var title: String { ["white": "Белый", "accent": "Из обложки", "glass": "Стекло"][rawValue]! }
 }
 
 enum LockPlayerStyle: String, CaseIterable {

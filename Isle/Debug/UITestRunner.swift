@@ -73,6 +73,31 @@ enum UITestRunner {
             print("committed pages: \(model.pages.map { $0.map(\.rawValue) })")
             model.beginEditing()
 
+            // Page slide frames: forward (1 → 2) then back (2 → 1), captured from the window.
+            model.cancelEditing()
+            model.pages = [[.weather], [.systemStats]]
+            model.sizes = [.weather: .small, .systemStats: .small]
+            model.page = 0
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            let frameDir = URL(fileURLWithPath: ProcessInfo.processInfo.environment["ISLE_FRAMES"] ?? NSTemporaryDirectory())
+            @MainActor func capture(_ name: String) {
+                guard let view = window.contentView,
+                      let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return }
+                view.cacheDisplay(in: view.bounds, to: rep)
+                try? rep.representation(using: .png, properties: [:])?.write(to: frameDir.appendingPathComponent(name))
+            }
+            for (label, target) in [("fwd", 1), ("back", 0), ("fwd2", 1)] {
+                model.goToPage(target)
+                var elapsed = 0
+                for ms in [0, 40, 80, 160, 300] {
+                    if ms > elapsed { try? await Task.sleep(nanoseconds: UInt64(ms - elapsed) * 1_000_000); elapsed = ms }
+                    capture("slide-\(label)-\(ms).png")
+                }
+                try? await Task.sleep(nanoseconds: 600_000_000)
+            }
+            print("frames in \(frameDir.path)")
+            model.beginEditing()
+
             // Square System card: style button at its bottom-right corner.
             let savedStyle = SmallStatsStyle.current
             SmallStatsStyle.current = .single
