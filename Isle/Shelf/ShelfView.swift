@@ -15,9 +15,7 @@ struct ShelfView: View {
         let list = model.visibleWidgets
         VStack(spacing: 0) {
             Color.clear.frame(height: model.notchSize.height + 6)
-            pageContent(list)
-                .id(model.page)
-                .transition(pageTransition)
+            pager(current: list)
             if model.editing {
                 ShelfPalette(model: model)
                     .padding(.top, 14)
@@ -28,13 +26,22 @@ struct ShelfView: View {
         .padding(.bottom, NotchMetrics.shelfPad)
     }
 
-    /// Pages slide vertically, like Control Center.
-    private var pageTransition: AnyTransition {
-        let forward = model.pageDirection > 0
-        return .asymmetric(
-            insertion: .move(edge: forward ? .bottom : .top).combined(with: .opacity),
-            removal: .move(edge: forward ? .top : .bottom).combined(with: .opacity)
-        )
+    /// All pages stacked in one vertical strip; the strip slides so the current page shows.
+    /// Next page sits below, previous above — the motion always follows the scroll.
+    private func pager(current: [ShelfWidget]) -> some View {
+        let all = model.editing ? model.draftPages : model.pages
+        let step = NotchMetrics.cardHeight + 40
+        return ZStack(alignment: .top) {
+            ForEach(Array(all.indices), id: \.self) { i in
+                pageContent(i == model.page ? current : all[i])
+                    .offset(y: CGFloat(i - model.page) * step)
+                    .opacity(i == model.page ? 1 : 0.35)
+                    .allowsHitTesting(i == model.page)
+            }
+        }
+        .frame(height: current.isEmpty ? NotchMetrics.emptyHeight : NotchMetrics.cardHeight, alignment: .top)
+        .frame(maxWidth: .infinity)
+        .clipped()
     }
 
     @ViewBuilder
