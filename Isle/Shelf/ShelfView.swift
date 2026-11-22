@@ -158,6 +158,8 @@ struct ShelfView: View {
         case (.mixer, true): MixerCard(mixer: AudioMixer.shared, small: true)
         case (.clipboard, false): ClipboardCard(clips: ClipboardService.shared)
         case (.clipboard, true): ClipboardCard(clips: ClipboardService.shared, small: true)
+        case (.tray, false): TrayCard(tray: TrayService.shared)
+        case (.tray, true): TrayCard(tray: TrayService.shared, small: true)
         }
     }
 }

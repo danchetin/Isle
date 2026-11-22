@@ -11,6 +11,7 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
     case agents
     case mixer
     case clipboard
+    case tray
 
     var id: String { rawValue }
 
@@ -24,6 +25,7 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
         case .agents: "Агенты"
         case .mixer: "Громкость"
         case .clipboard: "Буфер"
+        case .tray: "Трей"
         }
     }
 
@@ -37,6 +39,7 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
         case .agents: "sparkle"
         case .mixer: "slider.horizontal.3"
         case .clipboard: "doc.on.clipboard"
+        case .tray: "tray.full.fill"
         }
     }
 
@@ -50,6 +53,7 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
         case .agents: 360
         case .mixer: 320
         case .clipboard: 320
+        case .tray: 340
         }
     }
 

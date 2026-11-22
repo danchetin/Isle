@@ -170,14 +170,31 @@ enum SnapshotRunner {
                 NotchRootView(model: clipShelf, spotify: spotify)
             }, size: CGSize(width: 900, height: 300), name: "notch-clipboard.png", dir: outDir)
 
+            TrayService.shared.debugInject([
+                URL(fileURLWithPath: "/Applications/Safari.app"),
+                URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app"),
+                URL(fileURLWithPath: "/Library/User Pictures/Animals/Eagle.heic"),
+                URL(fileURLWithPath: "/etc/hosts"),
+            ])
+            let trayShelf = NotchModel()
+            trayShelf.notchSize = notchSize
+            trayShelf.pages = [[.tray, .clipboard]]
+            trayShelf.sizes = [.clipboard: .small]
+            trayShelf.expanded = true
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: trayShelf, spotify: spotify)
+            }, size: CGSize(width: 800, height: 300), name: "notch-tray.png", dir: outDir)
+
             let dropModel = NotchModel()
             dropModel.notchSize = notchSize
             dropModel.dropMode = true
+            dropModel.dropKind = .image
             dropModel.dropTargeted = true
             render(ZStack(alignment: .top) {
                 LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
                 NotchRootView(model: dropModel, spotify: spotify)
-            }, size: CGSize(width: 700, height: 200), name: "notch-drop.png", dir: outDir)
+            }, size: CGSize(width: 900, height: 200), name: "notch-drop.png", dir: outDir)
 
             let hudModel = NotchModel()
             hudModel.notchSize = notchSize

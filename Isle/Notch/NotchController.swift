@@ -1,8 +1,9 @@
 import AppKit
 import Combine
 import SwiftUI
+import UniformTypeIdentifiers
 
-enum DropKind { case image, app }
+enum DropKind { case file, image, imageData, app }
 
 @MainActor
 final class NotchModel: ObservableObject {
@@ -17,7 +18,7 @@ final class NotchModel: ObservableObject {
     @Published var dropMode = false
     @Published var dropTargeted = false
     /// What is being dragged: apps open the Cleaner, anything else goes to background removal.
-    @Published var dropKind: DropKind = .image
+    @Published var dropKind: DropKind = .file
 
     // MARK: Shelf pages (scroll / swipe between them, like Control Center)
 
@@ -177,7 +178,8 @@ enum NotchMetrics {
             return CGSize(width: body.width + ear * 2, height: body.height)
         }
         if model.dropMode {
-            return CGSize(width: dropSize.width + ear * 2, height: n.height + dropSize.height)
+            let targets = CGFloat(DropAction.targets(for: model.dropKind).count)
+            return CGSize(width: 40 + targets * 280 + (targets - 1) * 10 + ear * 2, height: n.height + dropSize.height)
         }
         if model.hud != nil {
             return CGSize(width: n.width + hudSide * 2 + ear * 2, height: n.height)
@@ -388,7 +390,15 @@ final class NotchController {
                    types.contains(.fileURL) || types.contains(.png) || types.contains(.tiff) {
                     fileDrag = true
                     let urls = pb.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
-                    model.dropKind = !urls.isEmpty && urls.allSatisfy { $0.pathExtension == "app" } ? .app : .image
+                    if urls.isEmpty {
+                        model.dropKind = .imageData
+                    } else if urls.allSatisfy({ $0.pathExtension == "app" }) {
+                        model.dropKind = .app
+                    } else if urls.allSatisfy({ UTType(filenameExtension: $0.pathExtension)?.conforms(to: .image) == true }) {
+                        model.dropKind = .image
+                    } else {
+                        model.dropKind = .file
+                    }
                 }
             }
             if fileDrag { dragMoved() } else { mouseMoved() }
@@ -412,7 +422,8 @@ final class NotchController {
 
     private func dropZoneRect() -> NSRect {
         guard let screen else { return .zero }
-        let size = NotchMetrics.dropSize
+        let targets = CGFloat(DropAction.targets(for: model.dropKind).count)
+        let size = CGSize(width: 40 + targets * 280 + (targets - 1) * 10, height: NotchMetrics.dropSize.height)
         let height = model.notchSize.height + size.height
         return NSRect(x: screen.frame.midX - size.width / 2, y: screen.frame.maxY - height, width: size.width, height: height)
             .insetBy(dx: -60, dy: -50)
