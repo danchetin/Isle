@@ -19,10 +19,12 @@ enum SnapshotRunner {
 
         Task { @MainActor in
             let spotify = SpotifyController.shared
-            spotify.start()
+            // ISLE_SAMPLE=1: demo data only (README screenshots), never the live track.
+            let sampleOnly = ProcessInfo.processInfo.environment["ISLE_SAMPLE"] == "1"
+            if !sampleOnly { spotify.start() }
 
             // Wait for track, cover and lyrics (or give up and use sample data).
-            let deadline = Date().addingTimeInterval(12)
+            let deadline = Date().addingTimeInterval(sampleOnly ? 0 : 12)
             while Date() < deadline {
                 if spotify.track != nil, spotify.artwork != nil,
                    spotify.lyricsState == .found || spotify.lyricsState == .missing { break }
@@ -41,8 +43,14 @@ enum SnapshotRunner {
             print("output: \(spotify.output.name) [\(spotify.output.symbol)]")
 
             let screen = NSScreen.screens.first?.frame.size ?? CGSize(width: 1470, height: 956)
+            // Demo mode: plain lock screen without the user's own widget row.
+            let userWidgets = UserDefaults.standard.string(forKey: LockKey.widgets)
+            if sampleOnly { injectShelfSamples(); UserDefaults.standard.set("", forKey: LockKey.widgets) }
             render(LockScreenView(spotify: spotify, onClose: {}), size: screen, name: "lock.png", dir: outDir)
             render(LockScreenView(spotify: spotify, onClose: {}, showLyrics: true), size: screen, name: "lock-lyrics.png", dir: outDir)
+            if sampleOnly {
+                if let userWidgets { UserDefaults.standard.set(userWidgets, forKey: LockKey.widgets) } else { UserDefaults.standard.removeObject(forKey: LockKey.widgets) }
+            }
             // Customized lock screen: widgets row, compact player, editor open. Settings restored after.
             let defaults = UserDefaults.standard
             let saved = [LockKey.widgets, LockKey.player, LockKey.clockFont].map { defaults.string(forKey: $0) }
@@ -80,7 +88,10 @@ enum SnapshotRunner {
             // Real system stats (no permissions needed): a few samples for the sparklines.
             SystemStatsService.shared.activate()
             BatteryService.shared.refresh(bluetooth: false)
-            BatteryService.shared.debugInject(BatteryService.shared.devices + [
+            let realBatteries = sampleOnly
+                ? [BatteryDevice(id: "mac", name: "MacBook", symbol: "laptopcomputer", level: 0.82, charging: false)]
+                : BatteryService.shared.devices
+            BatteryService.shared.debugInject(realBatteries + [
                 BatteryDevice(id: "L", name: "Левый", symbol: "airpodpro.left", level: 1, charging: false),
                 BatteryDevice(id: "R", name: "Правый", symbol: "airpodpro.right", level: 0.87, charging: false),
             ])

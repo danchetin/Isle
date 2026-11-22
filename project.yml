@@ -20,6 +20,10 @@ targets:
     platform: macOS
     sources:
       - path: Isle
+      - path: THIRD_PARTY_NOTICES.md
+        buildPhase: resources
+      - path: LICENSE
+        buildPhase: resources
     info:
       path: Isle/Resources/Info.plist
       properties:
