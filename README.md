@@ -40,4 +40,20 @@ Private APIs (SkyLight) can break with macOS updates.
 1. ✅ Now Playing + lock screen + lyrics + notch player + password dots
 2. ✅ Notch shelf: tabs, calendar (EventKit), weather (Open-Meteo, coords rounded to ~1 km), widget editor
 3. ✅ Volume/brightness HUD (media-key event tap, needs Accessibility), System Stats widget, Batteries widget
-4. Per-app volume, coding agents, background removal, cleaner, MCP
+4. ✅ Coding agents (Claude Code hooks → local socket), MCP server (`Isle --mcp`, per-tool opt-in),
+   background removal (drop on the notch → PNG on clipboard), Cleaner (app + leftovers → Trash),
+   per-app volume (CoreAudio process taps)
+5. iPhone companion: send to Mac clipboard, shared clipboard, Mac widgets, agent Live Activity
+
+## Debug entry points
+
+| Flag | What |
+|---|---|
+| `--snapshot <dir>` | render views to PNG |
+| `--uitest` | click shelf editor buttons in an invisible window |
+| `--probe` | Spotify AppleScript fields |
+| `--remove-bg <in> <out>` | background removal pipeline |
+| `--clean-scan <app>` | Cleaner dry run |
+| `--install-hooks` | add Claude Code hooks |
+| `--hook <source>` / `--mcp` | hook forwarder / MCP stdio server |
+| `--mixer-selftest` (via `open --args`) | tap the playing app at 50% for 4 s, log to ~/Library/Logs/Isle/lock.log |

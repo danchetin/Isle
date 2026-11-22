@@ -31,6 +31,7 @@ targets:
         NSCalendarsUsageDescription: "Isle shows today's events in the notch shelf."
         NSLocationUsageDescription: "Isle shows the weather for where you are."
         NSLocationWhenInUseUsageDescription: "Isle shows the weather for where you are."
+        NSAudioCaptureUsageDescription: "Isle changes the volume of individual apps by routing their audio through it."
         NSBluetoothAlwaysUsageDescription: "Isle shows the battery level of your AirPods and other Bluetooth devices."
         NSHumanReadableCopyright: ""
     entitlements:

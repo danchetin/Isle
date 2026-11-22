@@ -52,6 +52,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         server.start()
         socketServer = server
+
+        // Per-app volumes saved last time (only apps below 100% are touched).
+        AudioMixer.shared.start()
+        if CommandLine.arguments.contains("--mixer-selftest") { runMixerSelfTest() }
         setupStatusItem()
     }
 
@@ -182,4 +186,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func quit() { NSApp.terminate(nil) }
+
+    /// `open Isle.app --args --mixer-selftest`: tap the first app that is playing at 50%
+    /// for 4 s, log the result, restore. Runs inside the app so TCC attributes it to Isle.
+    private func runMixerSelfTest() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            MainActor.assumeIsolated {
+                let mixer = AudioMixer.shared
+                mixer.activate()
+                guard let app = mixer.apps.first(where: \.playing) else {
+                    IsleLog.write("mixer selftest: nothing playing; apps=\(mixer.apps.map(\.name))")
+                    return
+                }
+                mixer.setVolume(app, 0.5)
+                IsleLog.write("mixer selftest: \(app.name) at 50%, processes=\(app.processes.count), failed=\(mixer.failed ?? "no")")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    MainActor.assumeIsolated {
+                        mixer.setVolume(app, 1)
+                        mixer.deactivate()
+                        IsleLog.write("mixer selftest: restored \(app.name) to 100%")
+                    }
+                }
+            }
+        }
+    }
 }

@@ -26,6 +26,8 @@
 	<true/>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Isle reads the current Spotify track and controls playback.</string>
+	<key>NSAudioCaptureUsageDescription</key>
+	<string>Isle changes the volume of individual apps by routing their audio through it.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Isle shows the battery level of your AirPods and other Bluetooth devices.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>

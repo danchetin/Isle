@@ -131,6 +131,8 @@ struct ShelfView: View {
         case (.batteries, true): SmallBatteriesCard(batteries: BatteryService.shared)
         case (.agents, false): AgentsCard(agents: AgentsService.shared)
         case (.agents, true): SmallAgentsCard(agents: AgentsService.shared)
+        case (.mixer, false): MixerCard(mixer: AudioMixer.shared)
+        case (.mixer, true): MixerCard(mixer: AudioMixer.shared, small: true)
         }
     }
 }
