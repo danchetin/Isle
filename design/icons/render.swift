@@ -128,6 +128,49 @@ func mono(_ c: CGContext) {
     c.restoreGState()
 }
 
+
+// MARK: - Hybrids: Sunset Notch shape × Night Island palette
+
+/// Night (top) fading into a warm horizon (bottom) when `sunset` is true.
+func hybridBackground(_ c: CGContext, sunset: Bool) {
+    if sunset {
+        c.drawLinearGradient(gradient([rgb(0xFFB25B), rgb(0xFF5E86), rgb(0x5B2A86), rgb(0x1A1446), rgb(0x0B0B2A)], [0, 0.18, 0.5, 0.8, 1]),
+                             start: CGPoint(x: 0, y: 0), end: CGPoint(x: 0, y: S), options: [])
+    } else {
+        c.drawLinearGradient(gradient([rgb(0x0B0B2A), rgb(0x2A1658), rgb(0x5B2A86)], [0, 0.55, 1]),
+                             start: CGPoint(x: 0, y: S), end: CGPoint(x: S, y: 0), options: [])
+    }
+}
+
+func hybridNotch(_ c: CGContext, art: Bool) -> CGRect {
+    let notch = CGRect(x: S * 0.14, y: S * 0.52, width: S * 0.72, height: S * 0.48)
+    // pink glow spilling from under the island
+    c.drawRadialGradient(gradient([rgb(0xFF5FA2, 0.55), rgb(0xFF5FA2, 0)]), startCenter: CGPoint(x: S / 2, y: S * 0.5), startRadius: 0,
+                         endCenter: CGPoint(x: S / 2, y: S * 0.5), endRadius: S * 0.5, options: [])
+    c.saveGState()
+    c.setShadow(offset: CGSize(width: 0, height: -22), blur: 60, color: rgb(0x07031A, 0.7))
+    c.addPath(notchPath(notch, ear: S * 0.05, bottom: S * 0.14)); c.setFillColor(rgb(0x030305)); c.fillPath()
+    c.restoreGState()
+    let rowY = notch.minY + S * 0.1 // content sits low in the island, like the live activity
+    if art {
+        let a = S * 0.13
+        let artRect = CGRect(x: notch.minX + S * 0.12, y: rowY, width: a, height: a)
+        c.saveGState()
+        c.addPath(CGPath(roundedRect: artRect, cornerWidth: a * 0.28, cornerHeight: a * 0.28, transform: nil)); c.clip()
+        c.drawLinearGradient(gradient(warm), start: CGPoint(x: artRect.minX, y: artRect.maxY), end: CGPoint(x: artRect.maxX, y: artRect.minY), options: [])
+        c.restoreGState()
+        bars(c, in: CGRect(x: notch.maxX - S * 0.12 - S * 0.25, y: rowY + a * 0.2, width: S * 0.25, height: a * 0.6),
+             heights: wave, colors: warm)
+    } else {
+        bars(c, in: CGRect(x: S * 0.33, y: rowY - S * 0.005, width: S * 0.34, height: S * 0.15), heights: wave + [0.5], colors: warm)
+    }
+    return notch
+}
+
+func hybridA(_ c: CGContext) { hybridBackground(c, sunset: false); _ = hybridNotch(c, art: true) }
+func hybridB(_ c: CGContext) { hybridBackground(c, sunset: true); _ = hybridNotch(c, art: false) }
+func hybridC(_ c: CGContext) { hybridBackground(c, sunset: true); _ = hybridNotch(c, art: true) }
+
 // MARK: - Output
 
 func render(_ size: CGFloat, mac: Bool, _ draw: (CGContext) -> Void) -> Data {
@@ -161,6 +204,7 @@ let out = URL(fileURLWithPath: CommandLine.arguments[1])
 try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
 let concepts: [(String, (CGContext) -> Void)] = [
     ("1-night-island", nightIsland), ("2-glass", glassIsland), ("3-sunset-notch", sunsetNotch), ("4-mono", mono),
+    ("5a-night-notch", hybridA), ("5b-twilight-notch", hybridB), ("5c-twilight-notch-art", hybridC),
 ]
 for (name, draw) in concepts {
     try! render(1024, mac: true, draw).write(to: out.appendingPathComponent("\(name)-mac.png"))
