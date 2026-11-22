@@ -150,6 +150,26 @@ enum SnapshotRunner {
                 NotchRootView(model: pagedModel, spotify: spotify)
             }, size: CGSize(width: 1100, height: 420), name: "notch-pages-edit.png", dir: outDir)
 
+            // Clipboard: picker + shelf card with sample items (the real clipboard is untouched).
+            ClipboardService.shared.debugInject([
+                ClipItem(kind: .text, text: "git push -u origin main", image: nil, png: nil, date: Date(), sourceApp: "Терминал"),
+                ClipItem(kind: .link, text: "https://github.com/danchetin/isle", image: nil, png: nil, date: Date().addingTimeInterval(-300), sourceApp: "Chrome"),
+                ClipItem(kind: .text, text: "Привет! Скинь, пожалуйста, макет к вечеру\nи список правок", image: nil, png: nil, date: Date().addingTimeInterval(-900), sourceApp: "Telegram"),
+                ClipItem(kind: .image, text: nil, image: NSImage(systemSymbolName: "photo", accessibilityDescription: nil), png: nil, date: Date().addingTimeInterval(-1800), sourceApp: "Isle"),
+            ])
+            let pickerModel = ClipboardPickerModel()
+            pickerModel.selection = 1
+            render(ClipboardPickerView(model: pickerModel, clips: ClipboardService.shared) { _ in },
+                   size: CGSize(width: 380, height: 440), name: "clipboard-picker.png", dir: outDir)
+            let clipShelf = NotchModel()
+            clipShelf.notchSize = notchSize
+            clipShelf.pages = [[.clipboard, .nowPlaying]]
+            clipShelf.expanded = true
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: clipShelf, spotify: spotify)
+            }, size: CGSize(width: 900, height: 300), name: "notch-clipboard.png", dir: outDir)
+
             let dropModel = NotchModel()
             dropModel.notchSize = notchSize
             dropModel.dropMode = true

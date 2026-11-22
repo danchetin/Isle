@@ -156,6 +156,8 @@ struct ShelfView: View {
         case (.agents, true): SmallAgentsCard(agents: AgentsService.shared)
         case (.mixer, false): MixerCard(mixer: AudioMixer.shared)
         case (.mixer, true): MixerCard(mixer: AudioMixer.shared, small: true)
+        case (.clipboard, false): ClipboardCard(clips: ClipboardService.shared)
+        case (.clipboard, true): ClipboardCard(clips: ClipboardService.shared, small: true)
         }
     }
 }
