@@ -280,7 +280,11 @@ func refinedIsland(_ c: CGContext, halfWidth: CGFloat, ear: CGFloat) {
     c.addPath(path); c.setStrokeColor(rgb(0xFFFFFF, 0.1)); c.setLineWidth(5); c.strokePath()
     c.restoreGState()
 
-    // content: white waveform left, glowing warm dot right — sized to the island
+    islandContent(c, path: path, x0: x0, x1: x1, bottom: bottom)
+}
+
+/// White waveform left, glowing warm dot right, on the island's lower row.
+func islandContent(_ c: CGContext, path: CGPath, x0: CGFloat, x1: CGFloat, bottom: CGFloat) {
     let inner = (x1 - x0)
     let rowH = S * 0.11
     let rowY = bottom + S * 0.085
@@ -306,6 +310,52 @@ func refinedIsland(_ c: CGContext, halfWidth: CGFloat, ear: CGFloat) {
 func round3Narrow(_ c: CGContext) { refinedIsland(c, halfWidth: S * 0.22, ear: S * 0.075) }
 /// A bit wider, ears reaching towards the corner curve.
 func round3Wide(_ c: CGContext) { refinedIsland(c, halfWidth: S * 0.28, ear: S * 0.07) }
+
+// MARK: - Round 4: menu-bar band across the top + notch with concave fillets
+
+/// Full-width band (the menu bar) with the notch hanging from its underside; where they
+/// meet the corners are concave quarter-circles of radius `fillet`.
+func bandNotch(band: CGFloat, x0: CGFloat, x1: CGFloat, bottom: CGFloat, fillet f: CGFloat, radius b: CGFloat) -> CGPath {
+    let top = S + 2, yb = S - band
+    let p = CGMutablePath()
+    p.move(to: CGPoint(x: -2, y: top))
+    p.addLine(to: CGPoint(x: -2, y: yb))
+    p.addLine(to: CGPoint(x: x0 - f, y: yb))
+    p.addArc(tangent1End: CGPoint(x: x0, y: yb), tangent2End: CGPoint(x: x0, y: bottom), radius: f)
+    p.addArc(tangent1End: CGPoint(x: x0, y: bottom), tangent2End: CGPoint(x: x1, y: bottom), radius: b)
+    p.addArc(tangent1End: CGPoint(x: x1, y: bottom), tangent2End: CGPoint(x: x1, y: yb), radius: b)
+    p.addArc(tangent1End: CGPoint(x: x1, y: yb), tangent2End: CGPoint(x: S + 2, y: yb), radius: f)
+    p.addLine(to: CGPoint(x: S + 2, y: yb))
+    p.addLine(to: CGPoint(x: S + 2, y: top))
+    p.closeSubpath()
+    return p
+}
+
+func bandIsland(_ c: CGContext, band: CGFloat, halfWidth: CGFloat, bottom: CGFloat, fillet: CGFloat, radius: CGFloat) {
+    glassBackground(c)
+    let x0 = S / 2 - halfWidth, x1 = S / 2 + halfWidth
+    let path = bandNotch(band: band, x0: x0, x1: x1, bottom: bottom, fillet: fillet, radius: radius)
+    c.saveGState()
+    c.setShadow(offset: CGSize(width: 0, height: -26), blur: 70, color: rgb(0x3B2A7A, 0.5))
+    c.addPath(path); c.setFillColor(rgb(0x030305)); c.fillPath()
+    c.restoreGState()
+    c.saveGState()
+    c.addPath(path); c.clip()
+    c.drawLinearGradient(gradient([rgb(0x020204), rgb(0x0B0B10), rgb(0x16161D)], [0, 0.65, 1]),
+                         start: CGPoint(x: 0, y: S), end: CGPoint(x: 0, y: bottom), options: [])
+    c.addPath(path); c.setStrokeColor(rgb(0xFFFFFF, 0.1)); c.setLineWidth(5); c.strokePath()
+    c.restoreGState()
+    islandContent(c, path: path, x0: x0, x1: x1, bottom: bottom)
+}
+
+/// Exactly the user's sketch: wide notch, thin band, small fillets.
+func round4Sketch(_ c: CGContext) {
+    bandIsland(c, band: S * 0.068, halfWidth: S * 0.328, bottom: S * 0.435, fillet: S * 0.045, radius: S * 0.082)
+}
+/// Same idea, tighter: narrower and shorter notch, softer fillets and bottom.
+func round4Compact(_ c: CGContext) {
+    bandIsland(c, band: S * 0.075, halfWidth: S * 0.26, bottom: S * 0.53, fillet: S * 0.06, radius: S * 0.12)
+}
 
 // MARK: - Output
 
@@ -343,6 +393,7 @@ let concepts: [(String, (CGContext) -> Void)] = [
     ("5a-night-notch", hybridA), ("5b-twilight-notch", hybridB), ("5c-twilight-notch-art", hybridC),
     ("6a-glass-notch-art", round2A), ("6b-glass-notch-mono", round2B), ("6c-mono-notch-art", round2C),
     ("7a-glass-notch-narrow", round3Narrow), ("7b-glass-notch-wide", round3Wide),
+    ("8a-band-notch-sketch", round4Sketch), ("8b-band-notch-compact", round4Compact),
 ]
 for (name, draw) in concepts {
     try! render(1024, mac: true, draw).write(to: out.appendingPathComponent("\(name)-mac.png"))
