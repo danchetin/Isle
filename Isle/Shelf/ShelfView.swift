@@ -160,6 +160,8 @@ struct ShelfView: View {
         case (.clipboard, true): ClipboardCard(clips: ClipboardService.shared, small: true)
         case (.tray, false): TrayCard(tray: TrayService.shared)
         case (.tray, true): TrayCard(tray: TrayService.shared, small: true)
+        case (.currency, false): CurrencyCard(rates: CurrencyService.shared)
+        case (.currency, true): CurrencyCard(rates: CurrencyService.shared, small: true)
         }
     }
 }

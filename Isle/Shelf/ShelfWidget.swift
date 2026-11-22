@@ -12,6 +12,7 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
     case mixer
     case clipboard
     case tray
+    case currency
 
     var id: String { rawValue }
 
@@ -26,6 +27,7 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
         case .mixer: "Громкость"
         case .clipboard: "Буфер"
         case .tray: "Трей"
+        case .currency: "Курсы"
         }
     }
 
@@ -40,6 +42,7 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
         case .mixer: "slider.horizontal.3"
         case .clipboard: "doc.on.clipboard"
         case .tray: "tray.full.fill"
+        case .currency: "dollarsign.arrow.circlepath"
         }
     }
 
@@ -54,6 +57,7 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
         case .mixer: 320
         case .clipboard: 320
         case .tray: 340
+        case .currency: 330
         }
     }
 

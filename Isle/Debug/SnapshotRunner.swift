@@ -186,6 +186,20 @@ enum SnapshotRunner {
                 NotchRootView(model: trayShelf, spotify: spotify)
             }, size: CGSize(width: 800, height: 300), name: "notch-tray.png", dir: outDir)
 
+            // Currency: real rates (public API, no personal data).
+            CurrencyService.shared.refresh()
+            for _ in 0..<40 where CurrencyService.shared.quotes.isEmpty { try? await Task.sleep(nanoseconds: 250_000_000) }
+            print("currency: \(CurrencyService.shared.quotes.map { "\($0.code)=\(Int($0.value)) hist=\($0.history.count)" })")
+            let rateShelf = NotchModel()
+            rateShelf.notchSize = notchSize
+            rateShelf.pages = [[.currency, .currency]]
+            rateShelf.pages = [[.currency]]
+            rateShelf.expanded = true
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: rateShelf, spotify: spotify)
+            }, size: CGSize(width: 700, height: 300), name: "notch-currency.png", dir: outDir)
+
             let dropModel = NotchModel()
             dropModel.notchSize = notchSize
             dropModel.dropMode = true
