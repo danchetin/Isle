@@ -1,6 +1,8 @@
 import AppKit
 import SwiftUI
 
+enum DropKind { case image, app }
+
 @MainActor
 final class NotchModel: ObservableObject {
     @Published var expanded = false
@@ -13,6 +15,8 @@ final class NotchModel: ObservableObject {
     /// A file / image is being dragged near the notch: show the drop zone.
     @Published var dropMode = false
     @Published var dropTargeted = false
+    /// What is being dragged: apps open the Cleaner, anything else goes to background removal.
+    @Published var dropKind: DropKind = .image
 
     @Published var widgets = ShelfWidget.load()
     @Published var editing = false
@@ -277,6 +281,8 @@ final class NotchController {
                 if pb.changeCount != dragChangeCount,
                    types.contains(.fileURL) || types.contains(.png) || types.contains(.tiff) {
                     fileDrag = true
+                    let urls = pb.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+                    model.dropKind = !urls.isEmpty && urls.allSatisfy { $0.pathExtension == "app" } ? .app : .image
                 }
             }
             if fileDrag { dragMoved() } else { mouseMoved() }

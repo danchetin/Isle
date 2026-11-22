@@ -105,14 +105,14 @@ struct NotchDropZoneView: View {
         VStack(spacing: 0) {
             Color.clear.frame(height: model.notchSize.height)
             HStack(spacing: 14) {
-                Image(systemName: "wand.and.stars")
+                Image(systemName: model.dropKind == .app ? "trash" : "wand.and.stars")
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundStyle(model.dropTargeted ? Color.accentColor : .white)
                     .symbolEffect(.bounce, value: model.dropTargeted)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Убрать фон")
+                    Text(model.dropKind == .app ? "Удалить приложение" : "Убрать фон")
                         .font(.system(size: 15, weight: .semibold))
-                    Text("PNG без фона попадёт в буфер обмена")
+                    Text(model.dropKind == .app ? "Покажу его файлы — удалишь их в Корзину" : "PNG без фона попадёт в буфер обмена")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.white.opacity(0.55))
                 }
@@ -150,7 +150,16 @@ private struct DropTarget: ViewModifier {
             content
         } else {
             content.onDrop(of: [.fileURL, .image], isTargeted: $model.dropTargeted) { providers in
-                BackgroundRemover.handle(providers)
+                if model.dropKind == .app {
+                    for p in providers.prefix(3) {
+                        _ = p.loadObject(ofClass: NSURL.self) { obj, _ in
+                            guard let url = (obj as? NSURL).map({ $0 as URL }), url.pathExtension == "app" else { return }
+                            DispatchQueue.main.async { MainActor.assumeIsolated { CleanerWindows.open(app: url) } }
+                        }
+                    }
+                } else {
+                    BackgroundRemover.handle(providers)
+                }
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) { model.dropMode = false }
                 return true
             }

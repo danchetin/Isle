@@ -80,6 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
 
         menu.addItem(item("Превью lock screen", #selector(previewLock), key: "l"))
+        menu.addItem(item("Удалить приложение…", #selector(openCleaner)))
         menu.addItem(.separator())
         menu.addItem(toggle("Lock screen при блокировке", Prefs.lockScreenEnabled, #selector(toggleLock)))
         menu.addItem(toggle("Clock Depth (объект поверх часов)", Prefs.clockDepth, #selector(toggleDepth)))
@@ -129,6 +130,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func previewLock() { lock.togglePreview() }
+    @objc private func openCleaner() { CleanerWindows.chooseApp() }
     @objc private func toggleLock() { Prefs.lockScreenEnabled.toggle() }
     @objc private func toggleDepth() { Prefs.clockDepth.toggle() }
     @objc private func toggleClockStyle() { Prefs.clockStyle = Prefs.clockStyle == .large ? .inline : .large }

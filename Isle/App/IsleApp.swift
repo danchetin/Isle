@@ -20,6 +20,17 @@ enum IsleMain {
             print("wrote \(png.count) bytes")
             exit(0)
         }
+        if let i = args.firstIndex(of: "--clean-scan"), i + 1 < args.count {
+            // Dry run: list what the Cleaner would offer, delete nothing.
+            let app = URL(fileURLWithPath: args[i + 1])
+            if let refusal = CleanerScanner.refusal(for: app) { print("refused: \(refusal)"); exit(0) }
+            let found = CleanerScanner.scan(app: app)
+            print("bundle: \(found.bundleID ?? "-")")
+            for item in found.items {
+                print("\(item.selected ? "[x]" : "[ ]") \(item.kind) \(item.byName ? "(by name) " : "")\(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file))  \((item.url.path as NSString).abbreviatingWithTildeInPath)")
+            }
+            exit(0)
+        }
         if args.contains("--mcp") {
             McpServer.run()
         }
