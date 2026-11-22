@@ -1,0 +1,45 @@
+name: Isle
+options:
+  bundleIdPrefix: app.isle
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: XL2KLP55AX
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "Apple Development"
+    ENABLE_HARDENED_RUNTIME: YES
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEAD_CODE_STRIPPING: YES
+targets:
+  Isle:
+    type: application
+    platform: macOS
+    sources:
+      - path: Isle
+    info:
+      path: Isle/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Isle
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.utilities
+        NSAppleEventsUsageDescription: "Isle reads the current Spotify track and controls playback."
+        NSCalendarsFullAccessUsageDescription: "Isle shows today's events in the notch shelf."
+        NSCalendarsUsageDescription: "Isle shows today's events in the notch shelf."
+        NSLocationUsageDescription: "Isle shows the weather for where you are."
+        NSLocationWhenInUseUsageDescription: "Isle shows the weather for where you are."
+        NSBluetoothAlwaysUsageDescription: "Isle shows the battery level of your AirPods and other Bluetooth devices."
+        NSHumanReadableCopyright: ""
+    entitlements:
+      path: Isle/Resources/Isle.entitlements
+      properties:
+        com.apple.security.automation.apple-events: true
+        com.apple.security.personal-information.calendars: true
+        com.apple.security.personal-information.location: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.isle.Isle
+        GENERATE_INFOPLIST_FILE: NO
