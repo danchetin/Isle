@@ -164,11 +164,56 @@ struct SmallWeatherCard: View {
 struct SmallStatsCard: View {
     @ObservedObject var stats: SystemStatsService
     @AppStorage("smallStatsPage") private var page = 0
+    @AppStorage(SmallStatsStyle.key) private var style = SmallStatsStyle.single.rawValue
     @Environment(\.isSnapshot) private var isSnapshot
 
     var body: some View {
+        Group {
+            if style == SmallStatsStyle.quad.rawValue { quad } else { single }
+        }
+        .foregroundStyle(.white)
+        .onAppear { if !isSnapshot { stats.activate() } }
+        .onDisappear { if !isSnapshot { stats.deactivate() } }
+    }
+
+    /// Four rings: CPU, GPU, RAM, Disk.
+    private var quad: some View {
+        let ringColor = Color(red: 0.25, green: 0.52, blue: 1)
+        let diskUsed = 1 - stats.diskFree / max(stats.diskTotal, 1)
+        let items: [(String, Double?)] = [
+            ("CPU", stats.cpu),
+            ("GPU", stats.gpu),
+            ("RAM", stats.memoryUsed / max(stats.memoryTotal, 1)),
+            ("Disk", diskUsed),
+        ]
+        return LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 12) {
+            ForEach(items, id: \.0) { title, value in
+                ZStack {
+                    Circle().stroke(Color.white.opacity(0.14), lineWidth: 6)
+                    Circle()
+                        .trim(from: 0, to: CGFloat(min(max(value ?? 0, 0.001), 1)))
+                        .stroke(ringColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                        .animation(.spring(response: 0.5, dampingFraction: 0.85), value: value ?? 0)
+                    VStack(spacing: 0) {
+                        Text(title)
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.75))
+                        Text(value.map { "\(Int(($0 * 100).rounded()))%" } ?? "—")
+                            .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                            .contentTransition(.numericText())
+                    }
+                }
+                .frame(width: 60, height: 60)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    /// One big ring; tap pages CPU → RAM → GPU.
+    private var single: some View {
         let m = metric(page % 3)
-        VStack(spacing: 10) {
+        return VStack(spacing: 10) {
             ZStack {
                 Circle().stroke(m.color.opacity(0.2), lineWidth: 10)
                 Circle()
@@ -191,14 +236,11 @@ struct SmallStatsCard: View {
                 .foregroundStyle(.white.opacity(0.6))
                 .lineLimit(1)
         }
-        .foregroundStyle(.white)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
         .onTapGesture {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) { page = (page + 1) % 3 }
         }
-        .onAppear { if !isSnapshot { stats.activate() } }
-        .onDisappear { if !isSnapshot { stats.deactivate() } }
     }
 
     private func metric(_ page: Int) -> (title: String, value: String, caption: String, fraction: Double, color: Color) {
@@ -217,6 +259,19 @@ struct SmallStatsCard: View {
             return ("CPU", "\(Int((stats.cpu * 100).rounded()))%", temp, stats.cpu,
                     Color(red: 0.55, green: 0.56, blue: 1))
         }
+    }
+}
+
+/// Look of the square System card, switched from the shelf editor.
+enum SmallStatsStyle: String {
+    case single
+    case quad
+
+    static let key = "smallStatsStyle"
+
+    static var current: SmallStatsStyle {
+        get { SmallStatsStyle(rawValue: UserDefaults.standard.string(forKey: key) ?? "") ?? .single }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: key) }
     }
 }
 

@@ -59,6 +59,17 @@ enum UITestRunner {
             let row = model.draft.map(model.width(of:)).reduce(0, +) + NotchMetrics.cardGap * CGFloat(model.draft.count - 1)
             cardX = size.width / 2 - row / 2
             await click("after minus click", x: cardX + model.width(of: first), yFromTop: cardTop)
+
+            // Square System card: style button at its bottom-right corner.
+            let savedStyle = SmallStatsStyle.current
+            SmallStatsStyle.current = .single
+            model.draft = [.systemStats]
+            model.draftSizes[.systemStats] = .small
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            let side = NotchMetrics.cardHeight
+            await click("after style click", x: size.width / 2 + side / 2, yFromTop: cardTop + side)
+            print("style now: \(SmallStatsStyle.current.rawValue)")
+            SmallStatsStyle.current = savedStyle
             exit(0)
         }
         app.run()

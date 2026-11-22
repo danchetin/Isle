@@ -9,6 +9,7 @@ struct ShelfView: View {
     @State private var dragOffset: CGFloat = 0
     /// Layout shift already absorbed by swaps during the current drag.
     @State private var dragConsumed: CGFloat = 0
+    @AppStorage(SmallStatsStyle.key) private var smallStatsStyle = SmallStatsStyle.single.rawValue
 
     var body: some View {
         let list = model.visibleWidgets
@@ -39,7 +40,8 @@ struct ShelfView: View {
                                 },
                                 onResize: {
                                     withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) { model.toggleSize(widget) }
-                                }
+                                },
+                                variant: variant(for: widget)
                             ))
                             .offset(x: dragItem == widget ? dragOffset : 0)
                             .scaleEffect(dragItem == widget ? 1.03 : 1)
@@ -60,6 +62,21 @@ struct ShelfView: View {
         }
         .padding(.horizontal, NotchMetrics.shelfPad)
         .padding(.bottom, NotchMetrics.shelfPad)
+    }
+
+    /// Extra look switch for cards that have one (square System: one ring / four rings).
+    private func variant(for widget: ShelfWidget) -> EditDecoration.Variant? {
+        guard widget == .systemStats, model.size(of: widget) == .small else { return nil }
+        let quad = smallStatsStyle == SmallStatsStyle.quad.rawValue
+        return EditDecoration.Variant(
+            symbol: quad ? "circle" : "circle.grid.2x2",
+            help: quad ? "Одно кольцо" : "Четыре кольца",
+            action: {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                    smallStatsStyle = (quad ? SmallStatsStyle.single : .quad).rawValue
+                }
+            }
+        )
     }
 
     /// Edit mode: drag a card sideways; passing half of a neighbour swaps them.
@@ -117,11 +134,18 @@ struct ShelfView: View {
 }
 
 /// Dashed outline + red minus badge in edit mode.
-private struct EditDecoration: ViewModifier {
+struct EditDecoration: ViewModifier {
+    struct Variant {
+        let symbol: String
+        let help: String
+        let action: () -> Void
+    }
+
     let editing: Bool
     let small: Bool
     let onRemove: () -> Void
     let onResize: () -> Void
+    var variant: Variant?
 
     func body(content: Content) -> some View {
         content
@@ -164,6 +188,21 @@ private struct EditDecoration: ViewModifier {
                     .buttonStyle(PressableStyle())
                     .help(small ? "Сделать широким" : "Сделать квадратным")
                     .offset(x: -6, y: 6)
+                    .transition(.scale.combined(with: .opacity))
+                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if editing, let variant {
+                    Button(action: variant.action) {
+                        Image(systemName: variant.symbol)
+                            .font(.system(size: 9, weight: .heavy))
+                            .foregroundStyle(.white)
+                            .frame(width: 20, height: 20)
+                            .background(Circle().fill(Color.accentColor))
+                    }
+                    .buttonStyle(PressableStyle())
+                    .help(variant.help)
+                    .offset(x: 6, y: 6)
                     .transition(.scale.combined(with: .opacity))
                 }
             }

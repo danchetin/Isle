@@ -87,6 +87,20 @@ enum SnapshotRunner {
                 }
                 render(view, size: CGSize(width: 1300, height: 400), name: name, dir: outDir)
             }
+            // Square System card, four-ring style.
+            let savedStyle = SmallStatsStyle.current
+            SmallStatsStyle.current = .quad
+            let quadModel = NotchModel()
+            quadModel.notchSize = notchSize
+            quadModel.widgets = [.systemStats, .weather, .batteries]
+            quadModel.sizes = [.systemStats: .small, .weather: .small, .batteries: .small]
+            quadModel.expanded = true
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: quadModel, spotify: spotify)
+            }, size: CGSize(width: 900, height: 300), name: "notch-quad.png", dir: outDir)
+            SmallStatsStyle.current = savedStyle
+
             let hudModel = NotchModel()
             hudModel.notchSize = notchSize
             hudModel.hud = HUDInfo(kind: .volume, level: 0.62)
