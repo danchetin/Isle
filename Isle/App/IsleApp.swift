@@ -49,6 +49,29 @@ enum IsleMain {
             }
             exit(0)
         }
+        if args.contains("--claude-usage") {
+            let start = Date()
+            let entries = ClaudeUsageScanner().scan()
+            print("entries: \(entries.count) in \(String(format: "%.2f", Date().timeIntervalSince(start)))s")
+            MainActor.assumeIsolated {
+                let svc = ClaudeUsageService.shared
+                svc.refresh()
+            }
+            let deadline = Date().addingTimeInterval(20)
+            while Date() < deadline {
+                RunLoop.main.run(until: Date().addingTimeInterval(0.2))
+                let done = MainActor.assumeIsolated { ClaudeUsageService.shared.loaded }
+                if done { break }
+            }
+            MainActor.assumeIsolated {
+                let svc = ClaudeUsageService.shared
+                if let w = svc.current {
+                    print("window: \(w.start) – \(w.end), tokens \(formatTokens(w.tokens)), resets \(ClaudeUsageBar.remaining(w.end, now: Date()))")
+                } else { print("window: none active") }
+                print("peak week: \(formatTokens(svc.peak)), today: \(formatTokens(svc.today))")
+            }
+            exit(0)
+        }
         if args.contains("--mcp") {
             McpServer.run()
         }

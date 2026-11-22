@@ -138,6 +138,9 @@ enum SnapshotRunner {
                 AgentStep(id: "3", tool: "Edit", title: "Edit Hero.swift", symbol: "pencil", file: "Hero.swift", plus: 22, minus: 5, running: true),
             ]
             AgentsService.shared.debugInject([session])
+            ClaudeUsageService.shared.debugInject(
+                current: .init(start: Date().addingTimeInterval(-5600), end: Date().addingTimeInterval(12400), tokens: 27_500_000),
+                peak: 109_400_000, today: 136_900_000)
             let agentModel = NotchModel()
             agentModel.notchSize = notchSize
             render(ZStack(alignment: .top) {

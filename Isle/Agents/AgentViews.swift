@@ -224,6 +224,7 @@ struct AgentsCard: View {
                                 .foregroundStyle(.white.opacity(0.5))
                         }
                         Spacer(minLength: 0)
+                        ClaudeUsageBar(usage: ClaudeUsageService.shared)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     DiffCard(step: s.lastFileStep, state: s.state, tint: s.kind.color)
@@ -240,6 +241,9 @@ struct AgentsCard: View {
                     Text(HookInstaller.claudeInstalled ? "Claude Code подключён" : "Подключи Claude Code в меню Isle")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.white.opacity(0.4))
+                    ClaudeUsageBar(usage: ClaudeUsageService.shared)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 6)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -277,7 +281,7 @@ struct SmallAgentsCard: View {
                         }
                         .font(.system(size: 12, weight: .bold, design: .monospaced))
                     }
-                    ProgressBar(state: s.state, tint: s.kind.color)
+                    ClaudeUsageBar(usage: ClaudeUsageService.shared, compact: true)
                 }
                 .padding(12)
                 .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Color.white.opacity(0.07)))
@@ -289,6 +293,8 @@ struct SmallAgentsCard: View {
                     Text("Нет агентов")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.55))
+                    ClaudeUsageBar(usage: ClaudeUsageService.shared, compact: true)
+                        .padding(.horizontal, 14)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
