@@ -171,6 +171,66 @@ func hybridA(_ c: CGContext) { hybridBackground(c, sunset: false); _ = hybridNot
 func hybridB(_ c: CGContext) { hybridBackground(c, sunset: true); _ = hybridNotch(c, art: false) }
 func hybridC(_ c: CGContext) { hybridBackground(c, sunset: true); _ = hybridNotch(c, art: true) }
 
+
+// MARK: - Round 2: 5c notch × Glass background × Mono accents
+
+enum NotchContent { case artWave, monoDot }
+
+func glassBackground(_ c: CGContext) {
+    c.drawLinearGradient(gradient([rgb(0x8EC5FF), rgb(0xB9A7FF), rgb(0xFFC1E3)], [0, 0.55, 1]),
+                         start: CGPoint(x: 0, y: S), end: CGPoint(x: S, y: 0), options: [])
+    // soft light pooling under the island
+    c.drawRadialGradient(gradient([rgb(0xFFFFFF, 0.55), rgb(0xFFFFFF, 0)]), startCenter: CGPoint(x: S / 2, y: S * 0.42), startRadius: 0,
+                         endCenter: CGPoint(x: S / 2, y: S * 0.42), endRadius: S * 0.5, options: [])
+}
+
+func monoBackground(_ c: CGContext) {
+    c.drawLinearGradient(gradient([rgb(0x3A3A40), rgb(0x16161A), rgb(0x0B0B0D)], [0, 0.45, 1]),
+                         start: CGPoint(x: 0, y: S), end: CGPoint(x: 0, y: 0), options: [])
+    c.drawRadialGradient(gradient([rgb(0xFF7A3D, 0.18), rgb(0xFF7A3D, 0)]), startCenter: CGPoint(x: S / 2, y: S * 0.45), startRadius: 0,
+                         endCenter: CGPoint(x: S / 2, y: S * 0.45), endRadius: S * 0.5, options: [])
+}
+
+func notchIsland(_ c: CGContext, content: NotchContent, shadow: CGColor, rim: Bool) {
+    let notch = CGRect(x: S * 0.14, y: S * 0.52, width: S * 0.72, height: S * 0.48)
+    let path = notchPath(notch, ear: S * 0.05, bottom: S * 0.14)
+    c.saveGState()
+    c.setShadow(offset: CGSize(width: 0, height: -24), blur: 64, color: shadow)
+    c.addPath(path); c.setFillColor(rgb(0x030305)); c.fillPath()
+    c.restoreGState()
+    if rim { // faint edge light, like Mono's capsule outline
+        c.saveGState()
+        c.addPath(path); c.clip()
+        c.addPath(path); c.setStrokeColor(rgb(0xFFFFFF, 0.14)); c.setLineWidth(6); c.strokePath()
+        c.restoreGState()
+    }
+    let a = S * 0.13
+    let rowY = notch.minY + S * 0.1
+    switch content {
+    case .artWave:
+        let artRect = CGRect(x: notch.minX + S * 0.12, y: rowY, width: a, height: a)
+        c.saveGState()
+        c.addPath(CGPath(roundedRect: artRect, cornerWidth: a * 0.28, cornerHeight: a * 0.28, transform: nil)); c.clip()
+        c.drawLinearGradient(gradient(warm), start: CGPoint(x: artRect.minX, y: artRect.maxY), end: CGPoint(x: artRect.maxX, y: artRect.minY), options: [])
+        c.restoreGState()
+        bars(c, in: CGRect(x: notch.maxX - S * 0.12 - S * 0.25, y: rowY + a * 0.2, width: S * 0.25, height: a * 0.6),
+             heights: wave, colors: warm)
+    case .monoDot:
+        bars(c, in: CGRect(x: notch.minX + S * 0.13, y: rowY + a * 0.18, width: S * 0.27, height: a * 0.64),
+             heights: [0.45, 0.85, 1.0, 0.6, 0.8], colors: [rgb(0xFFFFFF, 0.95), rgb(0xFFFFFF, 0.7)])
+        let d = a * 0.62
+        let dot = CGRect(x: notch.maxX - S * 0.13 - d, y: rowY + (a - d) / 2, width: d, height: d)
+        c.saveGState()
+        c.setShadow(offset: .zero, blur: 50, color: rgb(0xFF7A3D, 1))
+        c.addEllipse(in: dot); c.setFillColor(rgb(0xFF7A3D)); c.fillPath()
+        c.restoreGState()
+    }
+}
+
+func round2A(_ c: CGContext) { glassBackground(c); notchIsland(c, content: .artWave, shadow: rgb(0x3B2A7A, 0.45), rim: false) }
+func round2B(_ c: CGContext) { glassBackground(c); notchIsland(c, content: .monoDot, shadow: rgb(0x3B2A7A, 0.45), rim: false) }
+func round2C(_ c: CGContext) { monoBackground(c); notchIsland(c, content: .artWave, shadow: rgb(0x000000, 0.75), rim: true) }
+
 // MARK: - Output
 
 func render(_ size: CGFloat, mac: Bool, _ draw: (CGContext) -> Void) -> Data {
@@ -205,6 +265,7 @@ try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: t
 let concepts: [(String, (CGContext) -> Void)] = [
     ("1-night-island", nightIsland), ("2-glass", glassIsland), ("3-sunset-notch", sunsetNotch), ("4-mono", mono),
     ("5a-night-notch", hybridA), ("5b-twilight-notch", hybridB), ("5c-twilight-notch-art", hybridC),
+    ("6a-glass-notch-art", round2A), ("6b-glass-notch-mono", round2B), ("6c-mono-notch-art", round2C),
 ]
 for (name, draw) in concepts {
     try! render(1024, mac: true, draw).write(to: out.appendingPathComponent("\(name)-mac.png"))
