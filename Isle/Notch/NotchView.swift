@@ -42,9 +42,9 @@ struct NotchRootView: View {
         let live = NotchMetrics.isLive(model: model, playing: spotify.isPlaying, hasTrack: hasTrack)
         let size = NotchMetrics.size(model: model, playing: spotify.isPlaying, hasTrack: hasTrack)
         let ear = NotchMetrics.ear
-        let toast = !model.expanded && model.hud == nil ? agents.toast : nil
+        let toast = !model.expanded && !model.dropMode && model.hud == nil ? agents.toast : nil
         let agent = !model.expanded && model.hud == nil && toast == nil ? agents.active : nil
-        let shape = NotchShape(topRadius: ear, bottomRadius: model.expanded ? 32 : (toast != nil ? 18 : 11))
+        let shape = NotchShape(topRadius: ear, bottomRadius: model.expanded || model.dropMode ? 28 : (toast != nil ? 18 : 11))
 
         VStack(spacing: 8) {
             ZStack(alignment: .top) {
@@ -52,6 +52,9 @@ struct NotchRootView: View {
                 Group {
                     if model.expanded {
                         ShelfView(model: model, spotify: spotify)
+                            .transition(.opacity.combined(with: .scale(scale: 0.94, anchor: .top)))
+                    } else if model.dropMode {
+                        NotchDropZoneView(model: model)
                             .transition(.opacity.combined(with: .scale(scale: 0.94, anchor: .top)))
                     } else if let hud = model.hud {
                         NotchHUDView(info: hud, notchHeight: model.notchSize.height)
@@ -87,6 +90,7 @@ struct NotchRootView: View {
         .animation(spring, value: live)
         .animation(spring, value: model.hud?.kind)
         .animation(spring, value: agents.toast)
+        .animation(spring, value: model.dropMode)
         .animation(spring, value: agents.active?.id)
         .environment(\.colorScheme, .dark)
     }

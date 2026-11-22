@@ -10,6 +10,16 @@ enum IsleMain {
         if let i = args.firstIndex(of: "--hook") {
             HookClient.run(arguments: Array(args[(i + 1)...]))
         }
+        if let i = args.firstIndex(of: "--remove-bg"), i + 2 < args.count {
+            let input = URL(fileURLWithPath: args[i + 1])
+            guard let cg = BackgroundRemover.loadImage(at: input), let png = BackgroundRemover.cutoutPNG(cg) else {
+                print("no subject / unreadable")
+                exit(1)
+            }
+            try? png.write(to: URL(fileURLWithPath: args[i + 2]))
+            print("wrote \(png.count) bytes")
+            exit(0)
+        }
         if args.contains("--mcp") {
             McpServer.run()
         }

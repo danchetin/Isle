@@ -10,6 +10,9 @@ final class NotchModel: ObservableObject {
     @Published var menuReveal = false
     /// Volume / brightness HUD currently shown in the collapsed island.
     @Published var hud: HUDInfo?
+    /// A file / image is being dragged near the notch: show the drop zone.
+    @Published var dropMode = false
+    @Published var dropTargeted = false
 
     @Published var widgets = ShelfWidget.load()
     @Published var editing = false
@@ -68,6 +71,7 @@ enum NotchMetrics {
     /// Agent toast: wider island grown downward.
     static let toastSide: CGFloat = 110
     static let toastExtraHeight: CGFloat = 44
+    static let dropSize = CGSize(width: 420, height: 104)
     static let panelSize = CGSize(width: 1200, height: 520)
 
     static let cardHeight: CGFloat = 168
@@ -105,6 +109,9 @@ enum NotchMetrics {
             let body = shelfBody(model: model)
             return CGSize(width: body.width + ear * 2, height: body.height)
         }
+        if model.dropMode {
+            return CGSize(width: dropSize.width + ear * 2, height: n.height + dropSize.height)
+        }
         if model.hud != nil {
             return CGSize(width: n.width + hudSide * 2 + ear * 2, height: n.height)
         }
@@ -131,6 +138,8 @@ final class NotchController {
     private var monitors: [Any] = []
     private var screenObserver: NSObjectProtocol?
     private var collapseWork: DispatchWorkItem?
+    private var dragChangeCount = NSPasteboard(name: .drag).changeCount
+    private var fileDrag = false
 
     init(spotify: SpotifyController) {
         self.spotify = spotify
@@ -170,13 +179,15 @@ final class NotchController {
         p.orderFrontRegardless()
         panel = p
 
-        let onMove: (NSEvent) -> Void = { [weak self] _ in
-            MainActor.assumeIsolated { self?.mouseMoved() }
+        let onMove: (NSEvent) -> Void = { [weak self] event in
+            let type = event.type
+            MainActor.assumeIsolated { self?.handleMouse(type) }
         }
-        if let g = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged], handler: onMove) {
+        let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .leftMouseDown, .leftMouseUp]
+        if let g = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: onMove) {
             monitors.append(g)
         }
-        if let l = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged], handler: { e in
+        if let l = NSEvent.addLocalMonitorForEvents(matching: mask, handler: { e in
             onMove(e)
             return e
         }) {
@@ -252,6 +263,67 @@ final class NotchController {
                       width: n.width + side * 2, height: n.height + 2)
     }
 
+    // MARK: - File drag → drop zone
+
+    private func handleMouse(_ type: NSEvent.EventType) {
+        switch type {
+        case .leftMouseDown:
+            dragChangeCount = NSPasteboard(name: .drag).changeCount
+            fileDrag = false
+        case .leftMouseDragged:
+            if !fileDrag {
+                let pb = NSPasteboard(name: .drag)
+                let types = pb.types ?? []
+                if pb.changeCount != dragChangeCount,
+                   types.contains(.fileURL) || types.contains(.png) || types.contains(.tiff) {
+                    fileDrag = true
+                }
+            }
+            if fileDrag { dragMoved() } else { mouseMoved() }
+        case .leftMouseUp:
+            if fileDrag || model.dropMode {
+                fileDrag = false
+                // Let the drop land first, then fold the zone away.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+                    MainActor.assumeIsolated { self?.setDropMode(false) }
+                }
+            }
+        default:
+            mouseMoved()
+        }
+    }
+
+    /// Where approaching with a file opens the drop zone: the notch plus a generous margin.
+    private func dropActivationRect() -> NSRect {
+        notchRect().insetBy(dx: -160, dy: -70)
+    }
+
+    private func dropZoneRect() -> NSRect {
+        guard let screen else { return .zero }
+        let size = NotchMetrics.dropSize
+        let height = model.notchSize.height + size.height
+        return NSRect(x: screen.frame.midX - size.width / 2, y: screen.frame.maxY - height, width: size.width, height: height)
+            .insetBy(dx: -60, dy: -50)
+    }
+
+    private func dragMoved() {
+        let p = NSEvent.mouseLocation
+        if !model.dropMode, !model.expanded, dropActivationRect().contains(p) {
+            setDropMode(true)
+        } else if model.dropMode, !dropZoneRect().contains(p) {
+            setDropMode(false)
+        }
+    }
+
+    private func setDropMode(_ on: Bool) {
+        guard model.dropMode != on else { return }
+        withAnimation(.spring(response: 0.38, dampingFraction: 0.8)) {
+            model.dropMode = on
+            if !on { model.dropTargeted = false }
+        }
+        panel?.ignoresMouseEvents = !(on || model.expanded)
+    }
+
     private func mouseMoved() {
         let p = NSEvent.mouseLocation
         let overNotch = notchRect().contains(p)
@@ -280,9 +352,10 @@ final class NotchController {
 
     private func setExpanded(_ expanded: Bool) {
         if !expanded, model.editing { return } // stay open while editing; ✓ / ✕ closes the editor
+        if model.dropMode { return }
         withAnimation(.spring(response: 0.42, dampingFraction: 0.8)) {
             model.expanded = expanded
         }
-        panel?.ignoresMouseEvents = !expanded
+        panel?.ignoresMouseEvents = !(expanded || model.dropMode)
     }
 }

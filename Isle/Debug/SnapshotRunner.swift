@@ -133,6 +133,15 @@ enum SnapshotRunner {
             }, size: CGSize(width: 900, height: 300), name: "notch-agents-shelf.png", dir: outDir)
             AgentsService.shared.debugInject([])
 
+            let dropModel = NotchModel()
+            dropModel.notchSize = notchSize
+            dropModel.dropMode = true
+            dropModel.dropTargeted = true
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: dropModel, spotify: spotify)
+            }, size: CGSize(width: 700, height: 200), name: "notch-drop.png", dir: outDir)
+
             let hudModel = NotchModel()
             hudModel.notchSize = notchSize
             hudModel.hud = HUDInfo(kind: .volume, level: 0.62)
