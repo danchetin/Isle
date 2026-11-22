@@ -87,3 +87,23 @@ enum WidgetSize: String, Equatable {
         UserDefaults.standard.set(raw, forKey: key)
     }
 }
+
+/// Shelf pages, saved as "a,b|c,d". The first launch after pages existed migrates the
+/// old single row ("shelfWidgets") into page 1.
+enum ShelfPages {
+    private static let key = "shelfPages"
+
+    static func load() -> [[ShelfWidget]] {
+        guard let raw = UserDefaults.standard.string(forKey: key) else {
+            return [ShelfWidget.load()]
+        }
+        let pages = raw.split(separator: "|", omittingEmptySubsequences: false).map { page in
+            page.split(separator: ",").compactMap { ShelfWidget(rawValue: String($0)) }
+        }
+        return pages.isEmpty ? [[]] : pages
+    }
+
+    static func save(_ pages: [[ShelfWidget]]) {
+        UserDefaults.standard.set(pages.map { $0.map(\.rawValue).joined(separator: ",") }.joined(separator: "|"), forKey: key)
+    }
+}

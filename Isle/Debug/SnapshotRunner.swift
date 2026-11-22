@@ -133,6 +133,23 @@ enum SnapshotRunner {
             }, size: CGSize(width: 900, height: 300), name: "notch-agents-shelf.png", dir: outDir)
             AgentsService.shared.debugInject([])
 
+            // Pages: second page active, dots in the tab bar.
+            let pagedModel = NotchModel()
+            pagedModel.notchSize = notchSize
+            pagedModel.pages = [[.nowPlaying, .calendar], [.systemStats, .weather, .batteries], [.agents]]
+            pagedModel.sizes = [.systemStats: .small, .weather: .small, .batteries: .small]
+            pagedModel.page = 1
+            pagedModel.expanded = true
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: pagedModel, spotify: spotify)
+            }, size: CGSize(width: 900, height: 320), name: "notch-pages.png", dir: outDir)
+            pagedModel.beginEditing()
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: pagedModel, spotify: spotify)
+            }, size: CGSize(width: 1100, height: 420), name: "notch-pages-edit.png", dir: outDir)
+
             let dropModel = NotchModel()
             dropModel.notchSize = notchSize
             dropModel.dropMode = true

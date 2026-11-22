@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 
 enum DropKind { case image, app }
@@ -18,11 +19,67 @@ final class NotchModel: ObservableObject {
     /// What is being dragged: apps open the Cleaner, anything else goes to background removal.
     @Published var dropKind: DropKind = .image
 
-    @Published var widgets = ShelfWidget.load()
+    // MARK: Shelf pages (scroll / swipe between them, like Control Center)
+
+    @Published var pages: [[ShelfWidget]] = ShelfPages.load()
+    @Published var page = 0
+    /// +1 when moving forward, -1 backward (which way pages slide).
+    @Published var pageDirection = 1
     @Published var editing = false
-    @Published var draft: [ShelfWidget] = []
+    @Published var draftPages: [[ShelfWidget]] = [[]]
+
+    var pageCount: Int { max(1, (editing ? draftPages : pages).count) }
+
+    /// Widgets of the current page.
+    var widgets: [ShelfWidget] {
+        get { pages.indices.contains(page) ? pages[page] : [] }
+        set {
+            if pages.isEmpty { pages = [newValue] } else { pages[min(page, pages.count - 1)] = newValue }
+        }
+    }
+
+    /// Current page while editing.
+    var draft: [ShelfWidget] {
+        get { draftPages.indices.contains(page) ? draftPages[page] : [] }
+        set { if draftPages.indices.contains(page) { draftPages[page] = newValue } }
+    }
 
     var visibleWidgets: [ShelfWidget] { editing ? draft : widgets }
+
+    func goToPage(_ target: Int) {
+        let p = max(0, min(target, pageCount - 1))
+        guard p != page else { return }
+        pageDirection = p > page ? 1 : -1
+        page = p
+    }
+
+    /// Page (while editing) a widget sits on, if any.
+    func pageOf(_ widget: ShelfWidget) -> Int? {
+        draftPages.firstIndex { $0.contains(widget) }
+    }
+
+    /// Palette tap: remove from this page, or bring here (moving it off another page).
+    func togglePalette(_ widget: ShelfWidget) {
+        if draft.contains(widget) {
+            draft.removeAll { $0 == widget }
+            return
+        }
+        guard canAdd(widget) else { return }
+        if let other = pageOf(widget) { draftPages[other].removeAll { $0 == widget } }
+        draft.append(widget)
+    }
+
+    func addPage() {
+        draftPages.append([])
+        goToPage(draftPages.count - 1)
+    }
+
+    func deleteCurrentPage() {
+        guard draftPages.count > 1 else { return }
+        draftPages.remove(at: page)
+        pageDirection = -1
+        page = min(page, draftPages.count - 1)
+    }
 
     @Published var sizes = WidgetSize.load()
     @Published var draftSizes: [ShelfWidget: WidgetSize] = [:]
@@ -49,21 +106,27 @@ final class NotchModel: ObservableObject {
     }
 
     func beginEditing() {
-        draft = widgets
+        draftPages = pages.isEmpty ? [[]] : pages
         draftSizes = sizes
         editing = true
     }
 
-    func commitEditing() {
-        widgets = draft
+    /// `persist: false` for tests: never touch the user's saved layout.
+    func commitEditing(persist: Bool = true) {
+        let kept = draftPages.filter { !$0.isEmpty }
+        pages = kept.isEmpty ? [[]] : kept
         sizes = draftSizes
-        ShelfWidget.save(widgets)
-        WidgetSize.save(sizes)
+        if persist {
+            ShelfPages.save(pages)
+            WidgetSize.save(sizes)
+        }
         editing = false
+        page = min(page, pages.count - 1)
     }
 
     func cancelEditing() {
         editing = false
+        page = min(page, max(pages.count - 1, 0))
     }
 }
 
@@ -91,7 +154,7 @@ enum NotchMetrics {
         let list = model.visibleWidgets
         var w = list.map(model.width(of:)).reduce(0, +) + cardGap * CGFloat(max(0, list.count - 1)) + shelfPad * 2
         if list.isEmpty { w = 380 }
-        if model.editing { w = max(w, 640) }
+        if model.editing { w = max(w, 820) }
         var h = model.notchSize.height + 6 + (list.isEmpty ? emptyHeight : cardHeight) + shelfPad
         if model.editing { h += paletteHeight }
         return CGSize(width: w, height: h)
@@ -142,6 +205,10 @@ final class NotchController {
     private var monitors: [Any] = []
     private var screenObserver: NSObjectProtocol?
     private var collapseWork: DispatchWorkItem?
+    private var cancellables = Set<AnyCancellable>()
+    private var scrollAccum: CGFloat = 0
+    private var scrollLocked = false
+    private var scrollIdle: DispatchWorkItem?
     private var dragChangeCount = NSPasteboard(name: .drag).changeCount
     private var fileDrag = false
 
@@ -183,6 +250,13 @@ final class NotchController {
         p.orderFrontRegardless()
         panel = p
 
+        // The panel takes clicks only while the shelf or the drop zone is open. Derived from
+        // state so no code path (e.g. a drop closing the zone from the view) can leave it
+        // swallowing clicks across the top of the screen.
+        model.$expanded.combineLatest(model.$dropMode)
+            .sink { [weak p] expanded, drop in p?.ignoresMouseEvents = !(expanded || drop) }
+            .store(in: &cancellables)
+
         let onMove: (NSEvent) -> Void = { [weak self] event in
             let type = event.type
             MainActor.assumeIsolated { self?.handleMouse(type) }
@@ -191,7 +265,12 @@ final class NotchController {
         if let g = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: onMove) {
             monitors.append(g)
         }
-        if let l = NSEvent.addLocalMonitorForEvents(matching: mask, handler: { e in
+        if let l = NSEvent.addLocalMonitorForEvents(matching: mask.union(.scrollWheel), handler: { [weak self] e in
+            if e.type == .scrollWheel {
+                let dx = e.scrollingDeltaX, dy = e.scrollingDeltaY, precise = e.hasPreciseScrollingDeltas
+                MainActor.assumeIsolated { self?.handleScroll(dx: dx, dy: dy, precise: precise) }
+                return e
+            }
             onMove(e)
             return e
         }) {
@@ -265,6 +344,33 @@ final class NotchController {
         let side = NotchMetrics.liveSide(notchHeight: n.height) + NotchMetrics.ear + 60
         return NSRect(x: screen.frame.midX - n.width / 2 - side, y: screen.frame.maxY - n.height - 2,
                       width: n.width + side * 2, height: n.height + 2)
+    }
+
+    // MARK: - Paging (scroll wheel / two-finger swipe)
+
+    private func handleScroll(dx: CGFloat, dy: CGFloat, precise: Bool) {
+        guard model.expanded, model.pageCount > 1 else { return }
+        // Unlock once the gesture (incl. momentum) has been quiet for a moment.
+        scrollIdle?.cancel()
+        let idle = DispatchWorkItem { [weak self] in
+            MainActor.assumeIsolated {
+                self?.scrollLocked = false
+                self?.scrollAccum = 0
+            }
+        }
+        scrollIdle = idle
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: idle)
+        guard !scrollLocked else { return }
+
+        scrollAccum += abs(dx) > abs(dy) ? dx : dy
+        let threshold: CGFloat = precise ? 30 : 0.9
+        guard abs(scrollAccum) >= threshold else { return }
+        let forward = scrollAccum < 0 // wheel down / swipe up or left → next page
+        scrollAccum = 0
+        scrollLocked = true
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) {
+            model.goToPage(model.page + (forward ? 1 : -1))
+        }
     }
 
     // MARK: - File drag → drop zone

@@ -15,11 +15,35 @@ struct ShelfView: View {
         let list = model.visibleWidgets
         VStack(spacing: 0) {
             Color.clear.frame(height: model.notchSize.height + 6)
+            pageContent(list)
+                .id(model.page)
+                .transition(pageTransition)
+            if model.editing {
+                ShelfPalette(model: model)
+                    .padding(.top, 14)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
+        }
+        .padding(.horizontal, NotchMetrics.shelfPad)
+        .padding(.bottom, NotchMetrics.shelfPad)
+    }
+
+    /// Pages slide vertically, like Control Center.
+    private var pageTransition: AnyTransition {
+        let forward = model.pageDirection > 0
+        return .asymmetric(
+            insertion: .move(edge: forward ? .bottom : .top).combined(with: .opacity),
+            removal: .move(edge: forward ? .top : .bottom).combined(with: .opacity)
+        )
+    }
+
+    @ViewBuilder
+    private func pageContent(_ list: [ShelfWidget]) -> some View {
             if list.isEmpty {
                 VStack(spacing: 6) {
                     Image(systemName: "square.grid.2x2")
                         .font(.system(size: 20, weight: .semibold))
-                    Text("Нет виджетов — добавь их в редакторе")
+                    Text(model.editing ? "Пустая страница — добавь виджеты из палитры" : "Пустая страница")
                         .font(.system(size: 12, weight: .semibold))
                 }
                 .foregroundStyle(.white.opacity(0.5))
@@ -54,14 +78,6 @@ struct ShelfView: View {
                     }
                 }
             }
-            if model.editing {
-                ShelfPalette(model: model)
-                    .padding(.top, 14)
-                    .transition(.opacity.combined(with: .move(edge: .bottom)))
-            }
-        }
-        .padding(.horizontal, NotchMetrics.shelfPad)
-        .padding(.bottom, NotchMetrics.shelfPad)
     }
 
     /// Extra look switch for cards that have one (square System: one ring / four rings).
@@ -195,7 +211,7 @@ struct EditDecoration: ViewModifier {
                     .transition(.scale.combined(with: .opacity))
                 }
             }
-            .overlay(alignment: .bottomTrailing) {
+            .overlay(alignment: .bottom) {
                 if editing, let variant {
                     Button(action: variant.action) {
                         Image(systemName: variant.symbol)
@@ -206,7 +222,7 @@ struct EditDecoration: ViewModifier {
                     }
                     .buttonStyle(PressableStyle())
                     .help(variant.help)
-                    .offset(x: 6, y: 6)
+                    .offset(y: 10)
                     .transition(.scale.combined(with: .opacity))
                 }
             }
@@ -222,11 +238,10 @@ private struct ShelfPalette: View {
         HStack(spacing: 10) {
             ForEach(ShelfWidget.allCases) { widget in
                 let on = model.draft.contains(widget)
+                let elsewhere = on ? nil : model.pageOf(widget)
                 let fits = on || model.canAdd(widget)
                 Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                        if on { model.draft.removeAll { $0 == widget } } else if fits { model.draft.append(widget) }
-                    }
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { model.togglePalette(widget) }
                 } label: {
                     VStack(spacing: 5) {
                         RoundedRectangle(cornerRadius: 11, style: .continuous)
@@ -244,6 +259,13 @@ private struct ShelfPalette: View {
                                         .symbolRenderingMode(.palette)
                                         .foregroundStyle(.white, Color.accentColor)
                                         .offset(x: 5, y: 5)
+                                } else if let elsewhere {
+                                    Text("\(elsewhere + 1)")
+                                        .font(.system(size: 9, weight: .heavy))
+                                        .foregroundStyle(.white)
+                                        .frame(width: 15, height: 15)
+                                        .background(Circle().fill(Color.gray))
+                                        .offset(x: 5, y: 5)
                                 }
                             }
                         Text(widget.title)
@@ -251,13 +273,18 @@ private struct ShelfPalette: View {
                             .foregroundStyle(.white.opacity(0.7))
                             .lineLimit(1)
                     }
-                    .frame(width: 62)
+                    .frame(width: 58)
                     .opacity(fits ? 1 : 0.35)
                 }
                 .buttonStyle(PressableStyle())
-                .help(fits ? widget.title : "Не помещается — убери другой виджет")
+                .help(!fits ? "Не помещается — убери другой виджет"
+                      : elsewhere.map { "На странице \($0 + 1) — нажми, чтобы перенести сюда" } ?? widget.title)
             }
             Spacer()
+            pageButton("plus.rectangle.on.rectangle", help: "Новая страница") { model.addPage() }
+            if model.pageCount > 1 {
+                pageButton("trash", help: "Удалить эту страницу (виджеты вернутся в палитру)") { model.deleteCurrentPage() }
+            }
             Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) { model.cancelEditing() } } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 14, weight: .bold))
@@ -277,6 +304,18 @@ private struct ShelfPalette: View {
         }
         .frame(height: NotchMetrics.paletteHeight - 14)
     }
+
+    private func pageButton(_ symbol: String, help: String, action: @escaping () -> Void) -> some View {
+        Button { withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) { action() } } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 34, height: 34)
+                .background(Circle().fill(Color.white.opacity(0.12)))
+        }
+        .buttonStyle(PressableStyle())
+        .help(help)
+    }
 }
 
 /// Glass pill under the island: shelf / widget editor.
@@ -290,6 +329,22 @@ struct ShelfTabBar: View {
             }
             tab("square.grid.2x2.fill", selected: model.editing) {
                 if model.editing { model.cancelEditing() } else { model.beginEditing() }
+            }
+            if model.pageCount > 1 {
+                Capsule().fill(Color.white.opacity(0.2)).frame(width: 1, height: 18).padding(.horizontal, 4)
+                ForEach(0..<model.pageCount, id: \.self) { i in
+                    Button {
+                        withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) { model.goToPage(i) }
+                    } label: {
+                        Circle()
+                            .fill(Color.white.opacity(i == model.page ? 0.95 : 0.3))
+                            .frame(width: 7, height: 7)
+                            .frame(width: 16, height: 30)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(PressableStyle())
+                }
+                .padding(.trailing, 2)
             }
         }
         .padding(4)

@@ -13,12 +13,13 @@ enum UITestRunner {
 
         let model = NotchModel()
         model.notchSize = CGSize(width: 185, height: 32)
-        model.widgets = [.nowPlaying, .calendar, .weather]
+        model.pages = [[.nowPlaying, .calendar, .weather]]
+        model.page = 0
         model.sizes = [:]
         model.expanded = true
         model.beginEditing()
 
-        let size = CGSize(width: 1300, height: 480)
+        let size = CGSize(width: 1400, height: 520)
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.borderless], backing: .buffered, defer: false)
         window.alphaValue = 0
         window.contentView = FirstMouseHostingView(rootView: NotchRootView(model: model, spotify: SpotifyController.shared).frame(width: size.width, height: size.height))
@@ -28,11 +29,19 @@ enum UITestRunner {
             try? await Task.sleep(nanoseconds: 800_000_000)
 
             // Geometry mirrors NotchMetrics / ShelfView.
-            let body = NotchMetrics.shelfBody(model: model)
             let cardTop = model.notchSize.height + 6
-            var cardX = size.width / 2 - body.width / 2 + NotchMetrics.shelfPad
+            /// Left edge of the card row (centered inside the shelf when narrower than the palette).
+            @MainActor func rowX() -> CGFloat {
+                let row = model.draft.map(model.width(of:)).reduce(0, +) + NotchMetrics.cardGap * CGFloat(max(model.draft.count - 1, 0))
+                let inner = NotchMetrics.shelfBody(model: model).width - NotchMetrics.shelfPad * 2
+                return size.width / 2 - inner / 2 + max(0, (inner - row) / 2)
+            }
+            /// Center of palette tile i (tiles are 58 wide, 10 apart, from the shelf's left edge).
+            @MainActor func tileX(_ i: Int) -> CGFloat {
+                size.width / 2 - NotchMetrics.shelfBody(model: model).width / 2 + NotchMetrics.shelfPad + CGFloat(i) * 68 + 29
+            }
+            let tileY = cardTop + NotchMetrics.cardHeight + 14 + 28
             let first = model.draft[0]
-            let firstWidth = model.width(of: first)
 
             @MainActor func click(_ label: String, x: CGFloat, yFromTop: CGFloat) async {
                 let p = NSPoint(x: x, y: size.height - yFromTop)
@@ -44,21 +53,25 @@ enum UITestRunner {
                     try? await Task.sleep(nanoseconds: 60_000_000)
                 }
                 try? await Task.sleep(nanoseconds: 400_000_000)
-                print("\(label): draft=\(model.draft.map(\.rawValue)) sizes=\(model.draftSizes.map { "\($0.key.rawValue)=\($0.value.rawValue)" }.sorted())")
+                print("\(label): page=\(model.page + 1)/\(model.pageCount) pages=\(model.draftPages.map { $0.map(\.rawValue) }) sizes=\(model.draftSizes.map { "\($0.key.rawValue)=\($0.value.rawValue)" }.sorted())")
             }
 
-            print("before: draft=\(model.draft.map(\.rawValue)) firstWidth=\(firstWidth)")
-            // Control: palette tile "Календарь" (second tile) should remove the calendar.
-            await click("after palette click (control)", x: cardX + 72 + 31, yFromTop: cardTop + NotchMetrics.cardHeight + 14 + 28)
-            await click("after palette click again", x: cardX + 72 + 31, yFromTop: cardTop + NotchMetrics.cardHeight + 14 + 28)
-            cardX = size.width / 2 - NotchMetrics.shelfBody(model: model).width / 2 + NotchMetrics.shelfPad
+            print("before: pages=\(model.draftPages.map { $0.map(\.rawValue) })")
+            // Palette tile "Календарь" (second) removes the calendar from this page.
+            await click("palette remove calendar", x: tileX(1), yFromTop: tileY)
             // Resize button: bottom-left corner of the first card.
-            await click("after resize click", x: cardX, yFromTop: cardTop + NotchMetrics.cardHeight)
-            // Minus button: top-right corner of the (now resized) first card.
-            // The card row is centered inside the shelf when it's narrower than the palette.
-            let row = model.draft.map(model.width(of:)).reduce(0, +) + NotchMetrics.cardGap * CGFloat(model.draft.count - 1)
-            cardX = size.width / 2 - row / 2
-            await click("after minus click", x: cardX + model.width(of: first), yFromTop: cardTop)
+            await click("resize first card", x: rowX(), yFromTop: cardTop + NotchMetrics.cardHeight)
+            // Minus button: top-right corner of the first card.
+            await click("minus first card", x: rowX() + model.width(of: first), yFromTop: cardTop)
+
+            // Pages: new page, then the weather tile (on page 1) moves here.
+            withAnimation { model.addPage() }
+            try? await Task.sleep(nanoseconds: 400_000_000)
+            print("after addPage: page=\(model.page + 1)/\(model.pageCount)")
+            await click("palette weather → page 2", x: tileX(2), yFromTop: cardTop + NotchMetrics.emptyHeight + 14 + 28)
+            model.commitEditing(persist: false)
+            print("committed pages: \(model.pages.map { $0.map(\.rawValue) })")
+            model.beginEditing()
 
             // Square System card: style button at its bottom-right corner.
             let savedStyle = SmallStatsStyle.current
@@ -67,7 +80,7 @@ enum UITestRunner {
             model.draftSizes[.systemStats] = .small
             try? await Task.sleep(nanoseconds: 500_000_000)
             let side = NotchMetrics.cardHeight
-            await click("after style click", x: size.width / 2 + side / 2, yFromTop: cardTop + side)
+            await click("style click", x: size.width / 2, yFromTop: cardTop + side + 4)
             print("style now: \(SmallStatsStyle.current.rawValue)")
             SmallStatsStyle.current = savedStyle
             exit(0)
