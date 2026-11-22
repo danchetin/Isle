@@ -127,11 +127,15 @@ private struct EditDecoration: ViewModifier {
         content
             .allowsHitTesting(!editing)
             .padding(editing ? 4 : 0)
+            // Drag area = the card. Must come before the corner buttons: a rounded content
+            // shape applied after them cuts off their hit area at the rounded corners.
+            .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
             .overlay {
                 if editing {
                     RoundedRectangle(cornerRadius: 22, style: .continuous)
                         .strokeBorder(style: StrokeStyle(lineWidth: 1.2, dash: [5, 4]))
                         .foregroundStyle(.white.opacity(0.4))
+                        .allowsHitTesting(false)
                 }
             }
             .overlay(alignment: .topTrailing) {
@@ -164,7 +168,6 @@ private struct EditDecoration: ViewModifier {
                 }
             }
             .padding(editing ? -4 : 0)
-            .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 }
 

@@ -6,6 +6,10 @@ enum IsleMain {
 
     static func main() {
         let args = CommandLine.arguments
+        if args.contains("--uitest") {
+            MainActor.assumeIsolated { UITestRunner.run() }
+            return
+        }
         if args.contains("--probe") {
             SpotifyProbe.run()
             return
