@@ -107,7 +107,7 @@ Requires Xcode 26+ and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```bash
 brew install xcodegen
-git clone https://github.com/danchetin/isle.git && cd isle
+git clone https://github.com/danchetin/Isle.git && cd Isle
 ./scripts/install.sh      # Release build → /Applications/Isle.app, then launch
 ```
 

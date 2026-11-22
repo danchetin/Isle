@@ -196,7 +196,7 @@ enum SnapshotRunner {
             // Clipboard: picker + shelf card with sample items (the real clipboard is untouched).
             ClipboardService.shared.debugInject([
                 ClipItem(kind: .text, text: "git push -u origin main", image: nil, png: nil, date: Date(), sourceApp: tr("Terminal", "Терминал")),
-                ClipItem(kind: .link, text: "https://github.com/danchetin/isle", image: nil, png: nil, date: Date().addingTimeInterval(-300), sourceApp: "Chrome"),
+                ClipItem(kind: .link, text: "https://github.com/danchetin/Isle", image: nil, png: nil, date: Date().addingTimeInterval(-300), sourceApp: "Chrome"),
                 ClipItem(kind: .text, text: tr("Hey! Could you send the mockup by tonight\nand the list of fixes?", "Привет! Скинь, пожалуйста, макет к вечеру\nи список правок"), image: nil, png: nil, date: Date().addingTimeInterval(-900), sourceApp: "Telegram"),
                 ClipItem(kind: .image, text: nil, image: NSImage(systemSymbolName: "photo", accessibilityDescription: nil), png: nil, date: Date().addingTimeInterval(-1800), sourceApp: "Isle"),
             ])

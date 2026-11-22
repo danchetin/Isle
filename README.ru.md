@@ -107,7 +107,7 @@ Isle не собирает аналитику и ни с кем не делит�
 
 ```bash
 brew install xcodegen
-git clone https://github.com/danchetin/isle.git && cd isle
+git clone https://github.com/danchetin/Isle.git && cd Isle
 ./scripts/install.sh      # Release → /Applications/Isle.app и запуск
 ```
 
