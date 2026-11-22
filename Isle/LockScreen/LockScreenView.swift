@@ -125,13 +125,13 @@ struct LockScreenView: View {
                         IconButton(systemName: "slider.horizontal.3", size: 15, opacity: editing ? 1 : 0.75) {
                             withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) { editing.toggle() }
                         }
-                        .help("Настроить экран блокировки")
+                        .help("Customize Lock Screen")
                     }
                     IconButton(systemName: "quote.bubble", size: 16, opacity: showLyrics ? 1 : 0.75) {
                         storedShowLyrics.toggle()
                     }
                     IconButton(systemName: "eye.slash", size: 15, opacity: 0.75, action: onClose)
-                        .help("Скрыть до следующей блокировки")
+                        .help("Hide until the next lock")
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, 6)

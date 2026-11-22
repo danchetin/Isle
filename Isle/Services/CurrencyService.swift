@@ -175,7 +175,7 @@ struct CurrencyCard: View {
                 Image(systemName: "dollarsign.arrow.circlepath")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(Color(red: 0.4, green: 0.85, blue: 0.55))
-                Text("Курсы").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white.opacity(0.6))
+                Text("Rates").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white.opacity(0.6))
                 Spacer()
                 if !small, let updated = rates.updated {
                     Text(updated.formatted(date: .omitted, time: .shortened))
@@ -189,12 +189,12 @@ struct CurrencyCard: View {
                         .background(Circle().fill(Color.white.opacity(0.12)))
                 }
                 .buttonStyle(PressableStyle())
-                .help("Конвертер (⌥⇧C)")
+                .help("Converter (⌥⇧C)")
             }
             if rates.quotes.isEmpty {
                 Group {
                     if rates.failed {
-                        Text("Не удалось загрузить курсы")
+                        Text("Couldn't load rates")
                     } else {
                         ProgressView().controlSize(.small).tint(.white)
                     }

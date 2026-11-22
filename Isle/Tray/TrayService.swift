@@ -99,7 +99,7 @@ private struct TrayTile: View {
                         .background(Circle().fill(Color(white: 0.3)))
                 }
                 .buttonStyle(PressableStyle())
-                .help("Убрать из трея (файл останется на месте)")
+                .help("Remove from tray (the file stays where it is)")
             }
         }
         .contentShape(Rectangle())
@@ -147,13 +147,13 @@ struct TrayCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "tray.full.fill").font(.system(size: 12, weight: .bold)).foregroundStyle(.white.opacity(0.6))
-                Text(tray.items.isEmpty ? "Трей" : "Трей · \(tray.items.count)")
+                Text(tray.items.isEmpty ? String(localized: "Tray") : String(localized: "Tray · \(tray.items.count)"))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
                 Spacer()
                 if !tray.items.isEmpty {
                     Button { withAnimation { tray.clear() } } label: {
-                        Text("Очистить")
+                        Text("Clear")
                             .font(.system(size: 10, weight: .semibold))
                             .padding(.horizontal, 8)
                             .padding(.vertical, 3)
@@ -165,7 +165,7 @@ struct TrayCard: View {
             if tray.items.isEmpty {
                 VStack(spacing: 6) {
                     Image(systemName: "tray.and.arrow.down").font(.system(size: 20, weight: .semibold))
-                    Text("Перетащи файлы к вырезу")
+                    Text("Drag files to the notch")
                         .font(.system(size: 11, weight: .semibold))
                         .multilineTextAlignment(.center)
                 }

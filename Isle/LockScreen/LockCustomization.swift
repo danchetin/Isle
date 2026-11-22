@@ -13,32 +13,32 @@ enum LockKey {
 
 enum LockClockFont: String, CaseIterable {
     case regular, rounded, thin
-    var title: String { ["regular": "Обычный", "rounded": "Округлый", "thin": "Тонкий"][rawValue]! }
+    var title: String { ["regular": String(localized: "Regular"), "rounded": String(localized: "Rounded"), "thin": String(localized: "Thin")][rawValue]! }
     var design: Font.Design { self == .rounded ? .rounded : .default }
     var weight: Font.Weight { self == .thin ? .ultraLight : .bold }
 }
 
 enum LockClockColor: String, CaseIterable {
     case white, accent, glass
-    var title: String { ["white": "Белый", "accent": "Из обложки", "glass": "Стекло"][rawValue]! }
+    var title: String { ["white": String(localized: "White"), "accent": String(localized: "From artwork"), "glass": String(localized: "Glass")][rawValue]! }
 }
 
 enum LockPlayerStyle: String, CaseIterable {
     case full, compact, hidden
-    var title: String { ["full": "Полный", "compact": "Карточка", "hidden": "Скрыт"][rawValue]! }
+    var title: String { ["full": String(localized: "Full"), "compact": String(localized: "Card"), "hidden": String(localized: "Hidden")][rawValue]! }
 }
 
 enum LockBackground: String, CaseIterable {
     case artwork, blurred
-    var title: String { self == .artwork ? "Обложка" : "Размытая" }
+    var title: String { self == .artwork ? String(localized: "Artwork") : String(localized: "Blurred") }
 }
 
 enum LockWidget: String, CaseIterable, Identifiable {
     case weather, calendar, batteries, system, agents, currency
     var id: String { rawValue }
     var title: String {
-        ["weather": "Погода", "calendar": "Календарь", "batteries": "Батареи",
-         "system": "Система", "agents": "Агенты", "currency": "Курсы"][rawValue]!
+        ["weather": String(localized: "Weather"), "calendar": String(localized: "Calendar"), "batteries": String(localized: "Batteries"),
+         "system": String(localized: "System"), "agents": String(localized: "Agents"), "currency": String(localized: "Rates")][rawValue]!
     }
     var symbol: String {
         ["weather": "cloud.sun.fill", "calendar": "calendar", "batteries": "battery.75percent",
@@ -100,13 +100,13 @@ struct LockWidgetsRow: View {
             if let d = weather.data {
                 row(symbol: WeatherInfo.symbol(d.code, day: d.isDay), big: "\(d.temp)°", small: "\(d.city) · ↑\(d.high)° ↓\(d.low)°")
             } else {
-                row(symbol: "cloud.sun.fill", big: "—", small: "Погода")
+                row(symbol: "cloud.sun.fill", big: "—", small: String(localized: "Weather"))
             }
         case .calendar:
             if let e = calendar.events.first {
-                row(symbol: "calendar", big: e.allDay ? "Весь день" : e.start.formatted(date: .omitted, time: .shortened), small: e.title)
+                row(symbol: "calendar", big: e.allDay ? String(localized: "All day") : e.start.formatted(date: .omitted, time: .shortened), small: e.title)
             } else {
-                row(symbol: "calendar", big: "Свободно", small: "Сегодня без событий")
+                row(symbol: "calendar", big: String(localized: "Free"), small: String(localized: "Nothing today"))
             }
         case .batteries:
             HStack(spacing: 10) {
@@ -119,17 +119,17 @@ struct LockWidgetsRow: View {
                 small: stats.temperature.map { "CPU · \(Int($0.rounded()))°C" } ?? "CPU")
         case .agents:
             if let s = agents.active ?? agents.latest {
-                row(symbol: s.kind.symbol, big: s.state == .done ? "Готово" : (s.state == .waiting ? "Ждёт тебя" : "Работает"),
+                row(symbol: s.kind.symbol, big: s.state == .done ? String(localized: "Done") : (s.state == .waiting ? String(localized: "Waiting for you") : String(localized: "Working")),
                     small: s.currentStep?.title ?? s.project)
             } else {
-                row(symbol: "sparkle", big: "Агенты", small: "Сейчас не работают")
+                row(symbol: "sparkle", big: String(localized: "Agents"), small: String(localized: "Not running"))
             }
         case .currency:
             if let usd = rates.quotes.first {
                 row(symbol: "dollarsign.circle", big: CurrencyQueryParser.format(usd.value) + " ֏",
                     small: usd.change.map { String(format: "USD %@%.2f%%", $0 >= 0 ? "▲" : "▼", abs($0) * 100) } ?? "USD")
             } else {
-                row(symbol: "dollarsign.circle", big: "—", small: "Курсы")
+                row(symbol: "dollarsign.circle", big: "—", small: String(localized: "Rates"))
             }
         }
     }
@@ -231,10 +231,10 @@ struct LockEditorPanel: View {
         let widgets = LockWidget.decode(widgetsRaw)
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Экран блокировки").font(.system(size: 16, weight: .bold))
+                Text("Lock Screen").font(.system(size: 16, weight: .bold))
                 Spacer()
                 Button(action: onDone) {
-                    Text("Готово")
+                    Text("Done")
                         .font(.system(size: 13, weight: .semibold))
                         .padding(.horizontal, 14)
                         .frame(height: 30)
@@ -243,16 +243,16 @@ struct LockEditorPanel: View {
                 .buttonStyle(PressableStyle())
             }
 
-            section("Часы")
-            Segmented(options: ClockStyle.allCasesForEditor, title: { $0 == .large ? "Большие" : "Компактные" },
+            section(String(localized: "Clock"))
+            Segmented(options: ClockStyle.allCasesForEditor, title: { $0 == .large ? String(localized: "Large") : String(localized: "Compact") },
                       selection: Binding(get: { ClockStyle(rawValue: clockStyle) ?? .large }, set: { clockStyle = $0.rawValue }))
             Segmented(options: LockClockFont.allCases, title: \.title,
                       selection: Binding(get: { LockClockFont(rawValue: clockFont) ?? .regular }, set: { clockFont = $0.rawValue }))
             Segmented(options: LockClockColor.allCases, title: \.title,
                       selection: Binding(get: { LockClockColor(rawValue: clockColor) ?? .white }, set: { clockColor = $0.rawValue }))
-            ToggleRow(title: "Clock Depth (объект поверх часов)", on: $clockDepth)
+            ToggleRow(title: String(localized: "Clock Depth (subject over the clock)"), on: $clockDepth)
 
-            section("Виджеты под часами · \(widgets.count)/\(LockWidget.maxCount)")
+            section(String(localized: "Widgets under the clock · \(widgets.count)/\(LockWidget.maxCount)"))
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8), GridItem(.flexible())], spacing: 8) {
                 ForEach(LockWidget.allCases) { w in
                     let index = widgets.firstIndex(of: w)
@@ -287,21 +287,21 @@ struct LockEditorPanel: View {
                 }
             }
 
-            section("Плеер")
+            section(String(localized: "Player"))
             Segmented(options: LockPlayerStyle.allCases, title: \.title,
                       selection: Binding(get: { LockPlayerStyle(rawValue: player) ?? .full }, set: { player = $0.rawValue }))
-            ToggleRow(title: "Тексты песен по умолчанию", on: $lyrics)
+            ToggleRow(title: String(localized: "Show lyrics by default"), on: $lyrics)
 
-            section("Фон")
+            section(String(localized: "Background"))
             Segmented(options: LockBackground.allCases, title: \.title,
                       selection: Binding(get: { LockBackground(rawValue: background) ?? .artwork }, set: { background = $0.rawValue }))
 
-            section("Стекло")
-            Segmented(options: [true, false], title: { $0 ? "Как в системе" : "Своё" }, selection: $glassFollow)
+            section(String(localized: "Glass"))
+            Segmented(options: [true, false], title: { $0 ? String(localized: "Match system") : String(localized: "Custom") }, selection: $glassFollow)
             if glassFollow {
                 Text(GlassSettings.reduceTransparency
-                     ? "Включено «Уменьшить прозрачность» — стекло непрозрачное"
-                     : "macOS: \(Int((GlassSettings.systemTint * 100).rounded()))% (Настройки → Оформление → Liquid Glass)")
+                     ? String(localized: "Reduce Transparency is on — glass is opaque")
+                     : String(localized: "macOS: \(Int((GlassSettings.systemTint * 100).rounded()))% (Settings → Appearance → Liquid Glass)"))
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.white.opacity(0.5))
             } else {
@@ -311,9 +311,9 @@ struct LockEditorPanel: View {
                     Image(systemName: "circle.fill").font(.system(size: 12, weight: .semibold)).opacity(0.6)
                 }
                 HStack {
-                    Text("Прозрачное")
+                    Text("Transparent")
                     Spacer()
-                    Text("Тонированное")
+                    Text("Tinted")
                 }
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(.white.opacity(0.45))

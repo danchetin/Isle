@@ -92,8 +92,8 @@ enum SnapshotRunner {
                 ? [BatteryDevice(id: "mac", name: "MacBook", symbol: "laptopcomputer", level: 0.82, charging: false)]
                 : BatteryService.shared.devices
             BatteryService.shared.debugInject(realBatteries + [
-                BatteryDevice(id: "L", name: "Левый", symbol: "airpodpro.left", level: 1, charging: false),
-                BatteryDevice(id: "R", name: "Правый", symbol: "airpodpro.right", level: 0.87, charging: false),
+                BatteryDevice(id: "L", name: tr("Left", "Левый"), symbol: "airpodpro.left", level: 1, charging: false),
+                BatteryDevice(id: "R", name: tr("Right", "Правый"), symbol: "airpodpro.right", level: 0.87, charging: false),
             ])
             try? await Task.sleep(nanoseconds: 9_000_000_000)
             let s = SystemStatsService.shared
@@ -158,7 +158,7 @@ enum SnapshotRunner {
                 LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
                 NotchRootView(model: agentModel, spotify: spotify)
             }, size: CGSize(width: 700, height: 120), name: "notch-agent.png", dir: outDir)
-            AgentsService.shared.debugToast(AgentToast(kind: .claude, title: "Claude закончил", subtitle: "Isle · 1 файл(ов)", state: .done))
+            AgentsService.shared.debugToast(AgentToast(kind: .claude, title: tr("Claude finished", "Claude закончил"), subtitle: tr("Isle · 1 file(s)", "Isle · 1 файл(ов)"), state: .done))
             render(ZStack(alignment: .top) {
                 LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
                 NotchRootView(model: agentModel, spotify: spotify)
@@ -195,9 +195,9 @@ enum SnapshotRunner {
 
             // Clipboard: picker + shelf card with sample items (the real clipboard is untouched).
             ClipboardService.shared.debugInject([
-                ClipItem(kind: .text, text: "git push -u origin main", image: nil, png: nil, date: Date(), sourceApp: "Терминал"),
+                ClipItem(kind: .text, text: "git push -u origin main", image: nil, png: nil, date: Date(), sourceApp: tr("Terminal", "Терминал")),
                 ClipItem(kind: .link, text: "https://github.com/danchetin/isle", image: nil, png: nil, date: Date().addingTimeInterval(-300), sourceApp: "Chrome"),
-                ClipItem(kind: .text, text: "Привет! Скинь, пожалуйста, макет к вечеру\nи список правок", image: nil, png: nil, date: Date().addingTimeInterval(-900), sourceApp: "Telegram"),
+                ClipItem(kind: .text, text: tr("Hey! Could you send the mockup by tonight\nand the list of fixes?", "Привет! Скинь, пожалуйста, макет к вечеру\nи список правок"), image: nil, png: nil, date: Date().addingTimeInterval(-900), sourceApp: "Telegram"),
                 ClipItem(kind: .image, text: nil, image: NSImage(systemSymbolName: "photo", accessibilityDescription: nil), png: nil, date: Date().addingTimeInterval(-1800), sourceApp: "Isle"),
             ])
             let pickerModel = ClipboardPickerModel()
@@ -278,14 +278,14 @@ enum SnapshotRunner {
         let cal = Calendar.current
         func today(_ h: Int, _ m: Int) -> Date { cal.date(bySettingHour: h, minute: m, second: 0, of: Date()) ?? Date() }
         CalendarService.shared.debugInject([
-            CalEvent(id: "1", title: "Созвон по проекту", start: today(10, 30), end: today(23, 0), allDay: false, color: .systemRed),
-            CalEvent(id: "2", title: "Собеседование", start: today(13, 0), end: today(23, 30), allDay: false, color: .systemYellow),
-            CalEvent(id: "3", title: "Спортзал", start: today(19, 30), end: today(23, 50), allDay: false, color: .systemGreen),
+            CalEvent(id: "1", title: tr("Project sync", "Созвон по проекту"), start: today(10, 30), end: today(23, 0), allDay: false, color: .systemRed),
+            CalEvent(id: "2", title: tr("Interview", "Собеседование"), start: today(13, 0), end: today(23, 30), allDay: false, color: .systemYellow),
+            CalEvent(id: "3", title: tr("Gym", "Спортзал"), start: today(19, 30), end: today(23, 50), allDay: false, color: .systemGreen),
         ])
         WeatherService.shared.debugInject(WeatherData(
-            city: "Ереван", temp: 7, code: 1, isDay: true, high: 11, low: 2,
+            city: tr("Yerevan", "Ереван"), temp: 7, code: 1, isDay: true, high: 11, low: 2,
             hours: [
-                WeatherHour(id: 0, label: "Сейчас", temp: 7, code: 1, isDay: true),
+                WeatherHour(id: 0, label: tr("Now", "Сейчас"), temp: 7, code: 1, isDay: true),
                 WeatherHour(id: 1, label: "11:00", temp: 8, code: 0, isDay: true),
                 WeatherHour(id: 2, label: "12:00", temp: 10, code: 2, isDay: true),
                 WeatherHour(id: 3, label: "13:00", temp: 11, code: 3, isDay: true),
@@ -348,4 +348,9 @@ private struct LockClockOnly: View {
             }
         }
     }
+}
+
+/// Sample data in the app's current language (README screenshots in English and Russian).
+private func tr(_ en: String, _ ru: String) -> String {
+    Bundle.main.preferredLocalizations.first == "ru" ? ru : en
 }

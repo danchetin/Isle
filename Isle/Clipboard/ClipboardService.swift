@@ -16,7 +16,7 @@ struct ClipItem: Identifiable, Equatable {
 
     var preview: String {
         switch kind {
-        case .image: "Изображение"
+        case .image: String(localized: "Image")
         default: (text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: " ⏎ ")
         }
     }

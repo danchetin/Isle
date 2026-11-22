@@ -131,7 +131,7 @@ final class AudioMixer: ObservableObject {
             taps[id] = tap
             failed = nil
         } else {
-            failed = "Нет доступа к звуку приложений: Настройки → Конфиденциальность → Запись звука"
+            failed = String(localized: "No access to app audio: Settings → Privacy & Security → Audio Recording")
         }
     }
 
@@ -212,7 +212,7 @@ struct MixerCard: View {
                 Image(systemName: "speaker.wave.2.fill")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(Color(red: 1, green: 0.6, blue: 0.25))
-                Text("Громкость")
+                Text("Volume")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
                 Spacer()
@@ -223,7 +223,7 @@ struct MixerCard: View {
                         .background(Circle().fill(Color.white.opacity(0.12)))
                 }
                 .buttonStyle(PressableStyle())
-                .help("Все приложения на 100%")
+                .help("All apps to 100%")
             }
             if let failed = mixer.failed {
                 Text(failed)
@@ -232,7 +232,7 @@ struct MixerCard: View {
                     .lineLimit(3)
             }
             if mixer.apps.isEmpty {
-                Text("Сейчас звук ничего не играет")
+                Text("Nothing is playing sound")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.45))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

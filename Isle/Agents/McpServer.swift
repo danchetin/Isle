@@ -13,13 +13,13 @@ enum McpTool: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .notchNotify: "Сообщение в вырезе"
-        case .nowPlaying: "Что играет"
-        case .playbackControl: "Управление Spotify"
-        case .systemStats: "Статистика системы"
-        case .setVolume: "Громкость"
-        case .weather: "Погода"
-        case .calendarToday: "События календаря"
+        case .notchNotify: String(localized: "Message in the notch")
+        case .nowPlaying: String(localized: "Now playing")
+        case .playbackControl: String(localized: "Spotify controls")
+        case .systemStats: String(localized: "System stats")
+        case .setVolume: String(localized: "Volume")
+        case .weather: String(localized: "Weather")
+        case .calendarToday: String(localized: "Calendar events")
         }
     }
 

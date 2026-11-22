@@ -48,7 +48,7 @@ struct ShelfView: View {
                 VStack(spacing: 6) {
                     Image(systemName: "square.grid.2x2")
                         .font(.system(size: 20, weight: .semibold))
-                    Text(model.editing ? "Пустая страница — добавь виджеты из палитры" : "Пустая страница")
+                    Text(model.editing ? String(localized: "Empty page — add widgets from the palette") : String(localized: "Empty page"))
                         .font(.system(size: 12, weight: .semibold))
                 }
                 .foregroundStyle(.white.opacity(0.5))
@@ -91,7 +91,7 @@ struct ShelfView: View {
         let quad = smallStatsStyle == SmallStatsStyle.quad.rawValue
         return EditDecoration.Variant(
             symbol: quad ? "circle" : "circle.grid.2x2",
-            help: quad ? "Одно кольцо" : "Четыре кольца",
+            help: quad ? String(localized: "One ring") : String(localized: "Four rings"),
             action: {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
                     smallStatsStyle = (quad ? SmallStatsStyle.single : .quad).rawValue
@@ -217,7 +217,7 @@ struct EditDecoration: ViewModifier {
                             .background(Circle().fill(Color(white: 0.3)))
                     }
                     .buttonStyle(PressableStyle())
-                    .help(small ? "Сделать широким" : "Сделать квадратным")
+                    .help(small ? String(localized: "Make wide") : String(localized: "Make square"))
                     .offset(x: -6, y: 6)
                     .transition(.scale.combined(with: .opacity))
                 }
@@ -289,17 +289,17 @@ private struct ShelfPalette: View {
                     .opacity(fits ? 1 : 0.35)
                 }
                 .buttonStyle(PressableStyle())
-                .help(!fits ? "Не помещается — убери другой виджет"
-                      : elsewhere.map { "На странице \($0 + 1) — нажми, чтобы перенести сюда" } ?? widget.title)
+                .help(!fits ? String(localized: "Doesn't fit — remove another widget")
+                      : elsewhere.map { String(localized: "On page \($0 + 1) — click to move it here") } ?? widget.title)
             }
             }
             .frame(width: 6 * 58 + 5 * 10, alignment: .leading)
             Spacer()
             VStack(alignment: .trailing, spacing: 14) {
                 HStack(spacing: 10) {
-                    pageButton("plus.rectangle.on.rectangle", help: "Новая страница") { model.addPage() }
+                    pageButton("plus.rectangle.on.rectangle", help: String(localized: "New page")) { model.addPage() }
                     if model.pageCount > 1 {
-                        pageButton("trash", help: "Удалить эту страницу (виджеты вернутся в палитру)") { model.deleteCurrentPage() }
+                        pageButton("trash", help: String(localized: "Delete this page (widgets go back to the palette)")) { model.deleteCurrentPage() }
                     }
                     Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) { model.cancelEditing() } } label: {
                         Image(systemName: "xmark")
@@ -402,10 +402,10 @@ struct ShelfBackgroundControls: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Text("Фон").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
+            Text("Background").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
             HStack(spacing: 2) {
-                option("Чёрный", ShelfLook.black)
-                option("Стекло", ShelfLook.glass)
+                option(String(localized: "Black"), ShelfLook.black)
+                option(String(localized: "Glass"), ShelfLook.glass)
             }
             .padding(2)
             .background(Capsule().fill(Color.white.opacity(0.08)))
@@ -413,7 +413,7 @@ struct ShelfBackgroundControls: View {
                 Image(systemName: "circle.dashed").font(.system(size: 10, weight: .semibold)).opacity(0.5)
                 ScrubBar(progress: darkness, height: 5, live: true) { darkness = max(0.05, $0) }
                     .frame(width: 110)
-                    .help("Прозрачная ↔ тёмная")
+                    .help("Clear ↔ dark")
                 Image(systemName: "circle.fill").font(.system(size: 10, weight: .semibold)).opacity(0.5)
             }
         }

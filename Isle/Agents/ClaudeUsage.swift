@@ -114,10 +114,10 @@ final class ClaudeUsageService: ObservableObject {
                 IsleLog.write("claude plan: 5h=\(usage.fiveHour.map { Int($0.percent) } ?? -1)% week=\(usage.week.map { Int($0.percent) } ?? -1)%")
             case .failure(let f):
                 planNote = switch f {
-                case .noToken: "Войди в Claude Code, чтобы видеть лимиты плана"
-                case .expired: "Токен Claude Code устарел — обновится при следующем запуске Claude"
-                case .http(let code): "Сервер лимитов недоступен (\(code))"
-                case .format: "Не понял ответ сервера лимитов"
+                case .noToken: String(localized: "Sign in to Claude Code to see plan limits")
+                case .expired: String(localized: "Claude Code token expired — it refreshes the next time Claude runs")
+                case .http(let code): String(localized: "Usage server unavailable (\(code))")
+                case .format: String(localized: "Couldn't read the usage server's response")
                 }
                 IsleLog.write("claude plan: unavailable (\(f))")
             }
@@ -189,19 +189,19 @@ struct ClaudeUsageBar: View {
         TimelineView(.everyMinute) { ctx in
             VStack(alignment: .leading, spacing: 4) {
                 if let plan = usage.plan {
-                    if let h = plan.fiveHour { planRow(compact ? "5ч" : "Лимит 5ч", h, now: ctx.date) }
-                    if let w = plan.week { planRow(compact ? "Нед." : "За неделю", w, now: ctx.date) }
+                    if let h = plan.fiveHour { planRow(compact ? String(localized: "5h") : String(localized: "5h limit"), h, now: ctx.date) }
+                    if let w = plan.week { planRow(compact ? String(localized: "Wk") : String(localized: "This week"), w, now: ctx.date) }
                 } else if let w = usage.current {
                     let fraction = usage.peak > 0 ? Double(w.tokens) / Double(max(usage.peak, w.tokens)) : 0
                     HStack(spacing: 6) {
                         Image(systemName: "hourglass").font(.system(size: 10, weight: .bold))
-                        Text(compact ? formatTokens(w.tokens) : "Окно 5ч · \(formatTokens(w.tokens))")
+                        Text(compact ? formatTokens(w.tokens) : String(localized: "5h window · \(formatTokens(w.tokens))"))
                         Spacer(minLength: 4)
                         Text("↻ \(Self.remaining(w.end, now: ctx.date))")
                             .foregroundStyle(.white.opacity(0.5))
                             .lineLimit(1)
                             .fixedSize()
-                            .help("Окно сбросится через это время")
+                            .help("Time until the window resets")
                     }
                     .font(.system(size: 11, weight: .semibold).monospacedDigit())
                     GeometryReader { geo in
@@ -213,11 +213,11 @@ struct ClaudeUsageBar: View {
                         }
                     }
                     .frame(height: 4)
-                    .help("Расход в текущем 5-часовом окне относительно самого большого окна за неделю (\(formatTokens(usage.peak))). Сегодня всего: \(formatTokens(usage.today)).")
+                    .help("Usage in the current 5-hour window compared with the week's biggest window (\(formatTokens(usage.peak))). Today in total: \(formatTokens(usage.today)).")
                 } else if usage.loaded {
                     HStack(spacing: 6) {
                         Image(systemName: "hourglass").font(.system(size: 10, weight: .bold))
-                        Text(compact ? "Окно свободно" : "Окно 5ч не начато · сегодня \(formatTokens(usage.today))")
+                        Text(compact ? String(localized: "Window free") : String(localized: "5h window not started · today \(formatTokens(usage.today))"))
                     }
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.5))
@@ -253,13 +253,13 @@ struct ClaudeUsageBar: View {
             }
             .frame(height: 4)
         }
-        .help("Лимиты плана Claude, как в меню Claude")
+        .help("Claude plan limits, as in the Claude menu")
     }
 
     static func remaining(_ end: Date, now: Date) -> String {
         let mins = max(0, Int(end.timeIntervalSince(now) / 60))
-        if mins >= 48 * 60 { return "\(mins / 1440)д \((mins % 1440) / 60)ч" }
-        return mins >= 60 ? "\(mins / 60)ч \(mins % 60)м" : "\(mins)м"
+        if mins >= 48 * 60 { return String(localized: "\(mins / 1440)d \((mins % 1440) / 60)h") }
+        return mins >= 60 ? String(localized: "\(mins / 60)h \(mins % 60)m") : String(localized: "\(mins)m")
     }
 }
 

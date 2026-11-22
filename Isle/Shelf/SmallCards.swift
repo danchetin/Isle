@@ -45,7 +45,7 @@ struct SmallNowPlayingCard: View {
                     Image(systemName: "music.note")
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.35))
-                    Text(spotify.isRunning ? "Ничего не играет" : "Spotify не запущен")
+                    Text(spotify.isRunning ? String(localized: "Nothing playing") : String(localized: "Spotify isn't running"))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.6))
                         .multilineTextAlignment(.center)
@@ -91,7 +91,7 @@ struct SmallCalendarCard: View {
     @ViewBuilder
     private var next: some View {
         if !calendar.hasAccess {
-            Text("Нет доступа к календарю")
+            Text("No calendar access")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.55))
         } else if let e = calendar.events.first {
@@ -103,14 +103,14 @@ struct SmallCalendarCard: View {
                     Text(e.title)
                         .font(.system(size: 13, weight: .semibold))
                         .lineLimit(2)
-                    Text(e.allDay ? "весь день" : e.start.formatted(date: .omitted, time: .shortened))
+                    Text(e.allDay ? String(localized: "all day") : e.start.formatted(date: .omitted, time: .shortened))
                         .font(.system(size: 11, weight: .semibold).monospacedDigit())
                         .foregroundStyle(.white.opacity(0.6))
                 }
             }
             .fixedSize(horizontal: false, vertical: true)
         } else {
-            Text("Сегодня событий нет")
+            Text("No events today")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.55))
         }
@@ -249,10 +249,10 @@ struct SmallStatsCard: View {
             let used = stats.memoryUsed / 1_073_741_824
             let total = stats.memoryTotal / 1_073_741_824
             return ("RAM", "\(Int((stats.memoryUsed / max(stats.memoryTotal, 1) * 100).rounded()))%",
-                    String(format: "%.1f из %.0f ГБ", used, total), stats.memoryUsed / max(stats.memoryTotal, 1),
+                    String(format: String(localized: "%.1f of %.0f GB"), used, total), stats.memoryUsed / max(stats.memoryTotal, 1),
                     Color(red: 0.3, green: 0.85, blue: 0.5))
         case 2:
-            return ("GPU", stats.gpu.map { "\(Int(($0 * 100).rounded()))%" } ?? "—", "видеочип", stats.gpu ?? 0,
+            return ("GPU", stats.gpu.map { "\(Int(($0 * 100).rounded()))%" } ?? "—", String(localized: "graphics"), stats.gpu ?? 0,
                     Color(red: 0.3, green: 0.8, blue: 0.95))
         default:
             let temp = stats.temperature.map { "\(Int($0.rounded()))°C" } ?? "—"
@@ -285,7 +285,7 @@ struct SmallBatteriesCard: View {
         let devices = Array(batteries.devices.prefix(4))
         Group {
             if devices.isEmpty {
-                Text("Нет устройств")
+                Text("No devices")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.5))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

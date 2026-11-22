@@ -145,7 +145,7 @@ private struct DiffCard: View {
             } else {
                 Image(systemName: "doc")
                     .foregroundStyle(.white.opacity(0.35))
-                Text("Без правок")
+                Text("No edits")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.45))
             }
@@ -162,9 +162,9 @@ private struct DiffCard: View {
 
     private var statusText: String {
         switch state {
-        case .working: "Работает…"
-        case .waiting: "Ждёт тебя"
-        case .done: "Готово"
+        case .working: String(localized: "Working…")
+        case .waiting: String(localized: "Waiting for you")
+        case .done: String(localized: "Done")
         }
     }
 }
@@ -219,7 +219,7 @@ struct AgentsCard: View {
                             ForEach(s.steps.suffix(4)) { StepRow(step: $0, tint: s.kind.color) }
                         }
                         if s.steps.isEmpty {
-                            Text(s.state == .done ? "Ждёт следующей задачи" : "Думает…")
+                            Text(s.state == .done ? String(localized: "Waiting for the next task") : String(localized: "Thinking…"))
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundStyle(.white.opacity(0.5))
                         }
@@ -235,10 +235,10 @@ struct AgentsCard: View {
                     Image(systemName: "sparkle")
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(AgentKind.claude.color.opacity(0.6))
-                    Text("Агенты сейчас не работают")
+                    Text("No agents running")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.6))
-                    Text(HookInstaller.claudeInstalled ? "Claude Code подключён" : "Подключи Claude Code в меню Isle")
+                    Text(HookInstaller.claudeInstalled ? String(localized: "Claude Code connected") : String(localized: "Connect Claude Code from the Isle menu"))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.white.opacity(0.4))
                     ClaudeUsageBar(usage: ClaudeUsageService.shared)
@@ -270,7 +270,7 @@ struct SmallAgentsCard: View {
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
-                    Text(s.currentStep?.title ?? (s.state == .done ? "Готово" : "Думает…"))
+                    Text(s.currentStep?.title ?? (s.state == .done ? String(localized: "Done") : String(localized: "Thinking…")))
                         .font(.system(size: 13, weight: .semibold))
                         .lineLimit(3)
                     Spacer(minLength: 0)
@@ -290,7 +290,7 @@ struct SmallAgentsCard: View {
                     Image(systemName: "sparkle")
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(AgentKind.claude.color.opacity(0.6))
-                    Text("Нет агентов")
+                    Text("No agents")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.55))
                     ClaudeUsageBar(usage: ClaudeUsageService.shared, compact: true)

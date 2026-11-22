@@ -73,7 +73,7 @@ struct NowPlayingCard: View {
                 .clipped()
                 .contentShape(Rectangle())
                 .onTapGesture { showLyrics = false } // always a way back to the controls
-                .help("Нажми, чтобы скрыть текст")
+                .help("Click to hide lyrics")
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             } else {
                 VStack(spacing: 6) {
@@ -120,18 +120,18 @@ struct NowPlayingCard: View {
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.35))
             if spotify.permissionDenied {
-                Text("Разреши Isle управлять Spotify")
+                Text("Allow Isle to control Spotify")
                     .font(.system(size: 13, weight: .semibold))
-                Text("Настройки → Конфиденциальность → Автоматизация")
+                Text("Settings → Privacy & Security → Automation")
                     .font(.system(size: 11))
                     .foregroundStyle(.white.opacity(0.5))
             } else {
-                Text(spotify.isRunning ? "Ничего не играет" : "Spotify не запущен")
+                Text(spotify.isRunning ? String(localized: "Nothing playing") : String(localized: "Spotify isn't running"))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                 if !spotify.isRunning {
                     Button { spotify.openSpotify() } label: {
-                        Text("Открыть Spotify")
+                        Text("Open Spotify")
                             .font(.system(size: 12, weight: .semibold))
                             .padding(.horizontal, 14)
                             .padding(.vertical, 6)
@@ -195,7 +195,7 @@ struct CalendarCard: View {
         switch calendar.status {
         case .fullAccess:
             if calendar.events.isEmpty {
-                message("На сегодня всё", symbol: "checkmark.circle")
+                message(String(localized: "All done for today"), symbol: "checkmark.circle")
             } else {
                 VStack(spacing: 6) {
                     ForEach(calendar.events.prefix(3)) { event in
@@ -205,9 +205,9 @@ struct CalendarCard: View {
             }
         case .notDetermined:
             VStack(alignment: .leading, spacing: 8) {
-                message("Нужен доступ к календарю", symbol: "calendar.badge.exclamationmark")
+                message(String(localized: "Calendar access needed"), symbol: "calendar.badge.exclamationmark")
                 Button { calendar.requestAccess() } label: {
-                    Text("Разрешить")
+                    Text("Allow")
                         .font(.system(size: 12, weight: .semibold))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 6)
@@ -216,7 +216,7 @@ struct CalendarCard: View {
                 .buttonStyle(PressableStyle())
             }
         default:
-            message("Нет доступа: Настройки → Конфиденциальность → Календари", symbol: "lock")
+            message(String(localized: "No access: Settings → Privacy & Security → Calendars"), symbol: "lock")
         }
     }
 
@@ -236,7 +236,7 @@ struct CalendarCard: View {
                 .font(.system(size: 14, weight: .semibold))
                 .lineLimit(1)
             Spacer(minLength: 6)
-            Text(e.allDay ? "весь день" : e.start.formatted(date: .omitted, time: .shortened))
+            Text(e.allDay ? String(localized: "all day") : e.start.formatted(date: .omitted, time: .shortened))
                 .font(.system(size: 13, weight: .semibold).monospacedDigit())
                 .foregroundStyle(.white.opacity(e.start <= Date() && !e.allDay ? 1 : 0.85))
         }
@@ -328,14 +328,14 @@ struct WeatherCard: View {
             case .loading, .idle:
                 ProgressView().controlSize(.small).tint(.white)
             case .needsPermission:
-                Text("Нужна геопозиция для погоды").font(.system(size: 13, weight: .semibold))
-                glassButton("Разрешить") { weather.requestPermission() }
+                Text("Weather needs your location").font(.system(size: 13, weight: .semibold))
+                glassButton(String(localized: "Allow")) { weather.requestPermission() }
             case .denied:
-                Text("Нет доступа к геопозиции").font(.system(size: 13, weight: .semibold))
-                glassButton("Открыть настройки") { weather.openLocationSettings() }
+                Text("No location access").font(.system(size: 13, weight: .semibold))
+                glassButton(String(localized: "Open Settings")) { weather.openLocationSettings() }
             case .failed:
-                Text("Не удалось загрузить погоду").font(.system(size: 13, weight: .semibold))
-                glassButton("Ещё раз") { weather.retry() }
+                Text("Couldn't load weather").font(.system(size: 13, weight: .semibold))
+                glassButton(String(localized: "Try again")) { weather.retry() }
             case .ready:
                 EmptyView()
             }

@@ -159,11 +159,11 @@ struct StatsCard: View {
             let usedGB = stats.memoryUsed / 1_073_741_824
             let totalGB = stats.memoryTotal / 1_073_741_824
             return (
-                Metric(title: "Память", value: String(format: "%.1f", usedGB), unit: "ГБ",
-                       caption: "из \(Int(totalGB.rounded())) ГБ", fraction: stats.memoryUsed / max(stats.memoryTotal, 1),
+                Metric(title: String(localized: "Memory"), value: String(format: "%.1f", usedGB), unit: String(localized: "GB"),
+                       caption: String(localized: "of \(Int(totalGB.rounded())) GB"), fraction: stats.memoryUsed / max(stats.memoryTotal, 1),
                        color: Self.green, symbol: "memorychip", history: stats.memoryHistory),
                 Metric(title: "GPU", value: stats.gpu.map { "\(Int(($0 * 100).rounded()))" } ?? "—", unit: "%",
-                       caption: "загрузка", fraction: stats.gpu ?? 0,
+                       caption: String(localized: "load"), fraction: stats.gpu ?? 0,
                        color: Self.cyan, symbol: "cube.transparent", history: stats.gpuHistory)
             )
         case 2:
@@ -173,22 +173,22 @@ struct StatsCard: View {
             let (upRate, upUnit) = Self.rate(stats.netUp)
             let peak = max(stats.netHistory.max() ?? 1, 1)
             return (
-                Metric(title: "Диск", value: "\(Int(freeGB.rounded()))", unit: "ГБ",
-                       caption: "свободно", fraction: used,
+                Metric(title: String(localized: "Disk"), value: "\(Int(freeGB.rounded()))", unit: String(localized: "GB"),
+                       caption: String(localized: "free"), fraction: used,
                        color: Self.blue, symbol: "internaldrive", history: []),
-                Metric(title: "Сеть", value: rate, unit: unit,
+                Metric(title: String(localized: "Network"), value: rate, unit: unit,
                        caption: "↑ \(upRate) \(upUnit)", fraction: min(1, stats.netDown / peak),
                        color: Self.pink, symbol: "arrow.down", history: stats.netHistory.map { $0 / peak })
             )
         default:
             let t = stats.temperature
             return (
-                Metric(title: "Температура", value: t.map { "\(Int($0.rounded()))" } ?? "—", unit: "°C",
+                Metric(title: String(localized: "Temperature"), value: t.map { "\(Int($0.rounded()))" } ?? "—", unit: "°C",
                        caption: Self.thermalText(stats.thermal), fraction: (t ?? 0) / 105,
                        color: Self.orange, symbol: "thermometer.medium",
                        history: stats.tempHistory.map { ($0 - 25) / 80 }),
                 Metric(title: "CPU", value: "\(Int((stats.cpu * 100).rounded()))", unit: "%",
-                       caption: "загрузка", fraction: stats.cpu,
+                       caption: String(localized: "load"), fraction: stats.cpu,
                        color: Self.indigo, symbol: "cpu", history: stats.cpuHistory)
             )
         }
@@ -196,18 +196,18 @@ struct StatsCard: View {
 
     private static func thermalText(_ s: ProcessInfo.ThermalState) -> String {
         switch s {
-        case .nominal: "Норма"
-        case .fair: "Тепло"
-        case .serious: "Горячо"
-        case .critical: "Перегрев"
+        case .nominal: String(localized: "Normal")
+        case .fair: String(localized: "Warm")
+        case .serious: String(localized: "Hot")
+        case .critical: String(localized: "Overheating")
         @unknown default: "—"
         }
     }
 
     private static func rate(_ bytesPerSecond: Double) -> (String, String) {
         let kb = bytesPerSecond / 1024
-        if kb < 1000 { return ("\(Int(kb.rounded()))", "КБ/с") }
-        return (String(format: "%.1f", kb / 1024), "МБ/с")
+        if kb < 1000 { return ("\(Int(kb.rounded()))", String(localized: "KB/s")) }
+        return (String(format: "%.1f", kb / 1024), String(localized: "MB/s"))
     }
 }
 
@@ -219,11 +219,11 @@ struct BatteriesCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Батареи")
+            Text("Batteries")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.6))
             if batteries.devices.isEmpty {
-                Text("Нет устройств с батареей")
+                Text("No battery devices")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.5))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

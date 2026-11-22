@@ -25,13 +25,13 @@ enum BluetoothBatteries {
             }
 
             if let l = percent("batteryPercentLeft") {
-                out.append(BatteryDevice(id: id + "-L", name: "Левый", symbol: budLeft, level: l, charging: false))
+                out.append(BatteryDevice(id: id + "-L", name: String(localized: "Left"), symbol: budLeft, level: l, charging: false))
             }
             if let r = percent("batteryPercentRight") {
-                out.append(BatteryDevice(id: id + "-R", name: "Правый", symbol: budRight, level: r, charging: false))
+                out.append(BatteryDevice(id: id + "-R", name: String(localized: "Right"), symbol: budRight, level: r, charging: false))
             }
             if let c = percent("batteryPercentCase") {
-                out.append(BatteryDevice(id: id + "-C", name: "Кейс", symbol: isPro ? "airpodspro.chargingcase.wireless.fill" : "airpods.chargingcase.fill", level: c, charging: false))
+                out.append(BatteryDevice(id: id + "-C", name: String(localized: "Case"), symbol: isPro ? "airpodspro.chargingcase.wireless.fill" : "airpods.chargingcase.fill", level: c, charging: false))
             }
             if let s = percent("batteryPercentSingle") ?? percent("batteryPercent") {
                 let symbol: String

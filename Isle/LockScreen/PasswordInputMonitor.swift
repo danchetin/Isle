@@ -177,7 +177,7 @@ struct PasswordIndicator: View {
                 .isleGlass(Capsule())
                 .transition(.opacity.combined(with: .scale(scale: 0.9)))
             } else {
-                Text("Touch ID или введите пароль")
+                Text("Touch ID or Enter Password")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white.opacity(0.6))
                     .frame(minHeight: 40)

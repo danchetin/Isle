@@ -107,7 +107,7 @@ final class ClipboardPicker {
         ClipboardService.shared.copy(item)
         close()
         guard AXIsProcessTrusted() else {
-            AgentsService.shared.notify(title: "Скопировано", subtitle: "Вставь ⌘V (для автовставки нужен Универсальный доступ)")
+            AgentsService.shared.notify(title: String(localized: "Copied"), subtitle: String(localized: "Paste with ⌘V (auto-paste needs Accessibility)"))
             return
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
@@ -183,7 +183,7 @@ struct ClipboardPickerView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 Image(systemName: "doc.on.clipboard").foregroundStyle(.white.opacity(0.6))
-                Text(model.query.isEmpty ? "Буфер обмена — печатай для поиска" : model.query)
+                Text(model.query.isEmpty ? String(localized: "Clipboard — type to search") : model.query)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.white.opacity(model.query.isEmpty ? 0.5 : 1))
                 Spacer()
@@ -191,7 +191,7 @@ struct ClipboardPickerView: View {
             }
             .padding(.horizontal, 6)
             if results.isEmpty {
-                Text(clips.items.isEmpty ? "История пуста — скопируй что-нибудь" : "Ничего не найдено")
+                Text(clips.items.isEmpty ? String(localized: "History is empty — copy something") : String(localized: "Nothing found"))
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.white.opacity(0.45))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -236,14 +236,14 @@ struct ClipboardCard: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Image(systemName: "doc.on.clipboard").font(.system(size: 12, weight: .bold)).foregroundStyle(.white.opacity(0.6))
-                Text("Буфер").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white.opacity(0.6))
+                Text("Clipboard").font(.system(size: 13, weight: .semibold)).foregroundStyle(.white.opacity(0.6))
                 Spacer()
                 if !small {
                     Text("⌥⇧V").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.35))
                 }
             }
             if clips.items.isEmpty {
-                Text("Пока пусто")
+                Text("Empty for now")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.45))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

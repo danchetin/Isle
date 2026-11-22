@@ -110,30 +110,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let t = spotify.track {
             title = "\(spotify.isPlaying ? "▶︎" : "❙❙")  \(t.name) — \(t.artist)"
         } else {
-            title = spotify.isRunning ? "Spotify: ничего не играет" : "Spotify не запущен"
+            title = spotify.isRunning ? String(localized: "Spotify: nothing playing") : String(localized: "Spotify isn't running")
         }
         let header = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         header.isEnabled = false
         menu.addItem(header)
         menu.addItem(.separator())
 
-        menu.addItem(item("Превью lock screen", #selector(previewLock), key: "l"))
-        menu.addItem(item("Настроить lock screen…", #selector(editLock)))
-        menu.addItem(item("Удалить приложение…", #selector(openCleaner)))
-        let clip = item("История буфера", #selector(openClipboard), key: "v")
+        menu.addItem(item(String(localized: "Preview Lock Screen"), #selector(previewLock), key: "l"))
+        menu.addItem(item(String(localized: "Customize Lock Screen…"), #selector(editLock)))
+        menu.addItem(item(String(localized: "Uninstall an App…"), #selector(openCleaner)))
+        let clip = item(String(localized: "Clipboard History"), #selector(openClipboard), key: "v")
         clip.keyEquivalentModifierMask = [.option, .shift]
         menu.addItem(clip)
-        let conv = item("Конвертер валют", #selector(openConverter), key: "c")
+        let conv = item(String(localized: "Currency Converter"), #selector(openConverter), key: "c")
         conv.keyEquivalentModifierMask = [.option, .shift]
         menu.addItem(conv)
         menu.addItem(.separator())
-        menu.addItem(toggle("Lock screen при блокировке", Prefs.lockScreenEnabled, #selector(toggleLock)))
-        menu.addItem(toggle("Clock Depth (объект поверх часов)", Prefs.clockDepth, #selector(toggleDepth)))
-        menu.addItem(toggle("Большие часы", Prefs.clockStyle == .large, #selector(toggleClockStyle)))
-        menu.addItem(toggle("Плеер в вырезе", Prefs.notchEnabled, #selector(toggleNotch)))
-        menu.addItem(toggle("HUD громкости и яркости", Prefs.hudEnabled, #selector(toggleHUD)))
-        menu.addItem(toggle("Агенты: Claude Code подключён", HookInstaller.claudeInstalled, #selector(toggleClaudeHooks)))
-        let mcpItem = NSMenuItem(title: "MCP-инструменты", action: nil, keyEquivalent: "")
+        menu.addItem(toggle(String(localized: "Lock Screen When Locked"), Prefs.lockScreenEnabled, #selector(toggleLock)))
+        menu.addItem(toggle(String(localized: "Clock Depth (subject over the clock)"), Prefs.clockDepth, #selector(toggleDepth)))
+        menu.addItem(toggle(String(localized: "Large Clock"), Prefs.clockStyle == .large, #selector(toggleClockStyle)))
+        menu.addItem(toggle(String(localized: "Player in the Notch"), Prefs.notchEnabled, #selector(toggleNotch)))
+        menu.addItem(toggle(String(localized: "Volume & Brightness HUD"), Prefs.hudEnabled, #selector(toggleHUD)))
+        menu.addItem(toggle(String(localized: "Agents: Claude Code Connected"), HookInstaller.claudeInstalled, #selector(toggleClaudeHooks)))
+        let mcpItem = NSMenuItem(title: String(localized: "MCP Tools"), action: nil, keyEquivalent: "")
         let mcpMenu = NSMenu()
         for tool in McpTool.allCases {
             let i = NSMenuItem(title: tool.title, action: #selector(toggleMcpTool(_:)), keyEquivalent: "")
@@ -143,29 +143,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             mcpMenu.addItem(i)
         }
         mcpMenu.addItem(.separator())
-        mcpMenu.addItem(item("Скопировать команду подключения для Claude Code", #selector(copyClaudeMcpCommand)))
-        mcpMenu.addItem(item("Скопировать конфиг для Codex", #selector(copyCodexMcpConfig)))
+        mcpMenu.addItem(item(String(localized: "Copy Claude Code Setup Command"), #selector(copyClaudeMcpCommand)))
+        mcpMenu.addItem(item(String(localized: "Copy Codex Config"), #selector(copyCodexMcpConfig)))
         mcpItem.submenu = mcpMenu
         menu.addItem(mcpItem)
 
         if !LoginwindowPasswordField.trusted {
             menu.addItem(.separator())
-            menu.addItem(item("Разрешить Универсальный доступ (пароль, HUD)…", #selector(requestAccessibility)))
+            menu.addItem(item(String(localized: "Allow Accessibility (Password, HUD)…"), #selector(requestAccessibility)))
         }
 
         if spotify.permissionDenied {
             menu.addItem(.separator())
-            menu.addItem(item("Разрешить доступ к Spotify…", #selector(openAutomationSettings)))
+            menu.addItem(item(String(localized: "Allow Spotify Access…"), #selector(openAutomationSettings)))
         }
 
         menu.addItem(.separator())
-        menu.addItem(toggle("Запускать при входе", SMAppService.mainApp.status == .enabled, #selector(toggleLoginItem)))
+        menu.addItem(toggle(String(localized: "Open at Login"), SMAppService.mainApp.status == .enabled, #selector(toggleLoginItem)))
         if !isInstalled {
-            let dev = NSMenuItem(title: "Dev-сборка: \((Bundle.main.bundlePath as NSString).abbreviatingWithTildeInPath)", action: nil, keyEquivalent: "")
+            let dev = NSMenuItem(title: String(localized: "Dev build: \((Bundle.main.bundlePath as NSString).abbreviatingWithTildeInPath)"), action: nil, keyEquivalent: "")
             dev.isEnabled = false
             menu.addItem(dev)
         }
-        menu.addItem(item("Выйти из Isle", #selector(quit), key: "q"))
+        menu.addItem(languageMenu())
+        menu.addItem(item(String(localized: "Quit Isle"), #selector(quit), key: "q"))
     }
 
     private func item(_ title: String, _ action: Selector, key: String = "") -> NSMenuItem {
@@ -249,6 +250,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func quit() { NSApp.terminate(nil) }
+
+    // MARK: - Language
+
+    /// App language override: "" = follow the system, otherwise a localization code.
+    private var languageOverride: String {
+        let domain = UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "") ?? [:]
+        return (domain["AppleLanguages"] as? [String])?.first ?? ""
+    }
+
+    private func languageMenu() -> NSMenuItem {
+        let root = NSMenuItem(title: String(localized: "Language"), action: nil, keyEquivalent: "")
+        let sub = NSMenu()
+        let current = languageOverride
+        for (code, name) in [("", String(localized: "Match System")), ("en", "English"), ("ru", "Русский")] {
+            let i = item(name, #selector(setLanguage(_:)))
+            i.representedObject = code
+            i.state = (current.hasPrefix(code) && !code.isEmpty) || (code.isEmpty && current.isEmpty) ? .on : .off
+            sub.addItem(i)
+        }
+        root.submenu = sub
+        return root
+    }
+
+    @objc private func setLanguage(_ sender: NSMenuItem) {
+        let code = sender.representedObject as? String ?? ""
+        guard code != languageOverride else { return }
+        if code.isEmpty {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        } else {
+            UserDefaults.standard.set([code], forKey: "AppleLanguages")
+        }
+        UserDefaults.standard.synchronize()
+        // Relaunch so every view picks up the new language.
+        let relaunch = Process()
+        relaunch.executableURL = URL(fileURLWithPath: "/bin/sh")
+        relaunch.arguments = ["-c", "sleep 1; /usr/bin/open \"$0\"", Bundle.main.bundlePath]
+        try? relaunch.run()
+        NSApp.terminate(nil)
+    }
 
     /// `open Isle.app --args --mixer-selftest`: tap the first app that is playing at 50%
     /// for 4 s, log the result, restore. Runs inside the app so TCC attributes it to Isle.

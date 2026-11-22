@@ -43,7 +43,7 @@ enum IsleMain {
             }.resume()
             sema.wait()
             for q in args[(i + 1)...] {
-                guard let parsed = CurrencyQueryParser.parse(q, known: Set(rates.keys)) else { print("\(q) → (не понял)"); continue }
+                guard let parsed = CurrencyQueryParser.parse(q, known: Set(rates.keys)) else { print("\(q) → (not understood)"); continue }
                 let out = CurrencyQueryParser.convert(parsed, rates: rates).map { "\(CurrencyQueryParser.format($0.value)) \($0.code.uppercased())" }
                 print("\(q) → \(parsed.amount) \(parsed.from) → \(out.joined(separator: ", "))")
             }

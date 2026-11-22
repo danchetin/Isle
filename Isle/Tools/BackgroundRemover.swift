@@ -22,20 +22,20 @@ enum BackgroundRemover {
                 }
             }
             guard !images.isEmpty else {
-                AgentsService.shared.notify(title: "Нужна картинка", subtitle: "Перетащи фото или PNG/JPG/HEIC")
+                AgentsService.shared.notify(title: String(localized: "Need an image"), subtitle: String(localized: "Drop a photo or a PNG/JPG/HEIC"))
                 return
             }
             let pngs = await Task.detached(priority: .userInitiated) {
                 images.compactMap { BackgroundRemover.cutoutPNG($0) }
             }.value
             guard !pngs.isEmpty else {
-                AgentsService.shared.notify(title: "Не нашёл объект", subtitle: "Попробуй фото с чётким объектом")
+                AgentsService.shared.notify(title: String(localized: "No subject found"), subtitle: String(localized: "Try a photo with a clear subject"))
                 return
             }
             copyToPasteboard(pngs)
             AgentsService.shared.notify(
-                title: "Фон убран",
-                subtitle: pngs.count == 1 ? "PNG в буфере обмена — вставляй ⌘V" : "\(pngs.count) PNG в буфере обмена"
+                title: String(localized: "Background removed"),
+                subtitle: pngs.count == 1 ? String(localized: "PNG on the clipboard — paste with ⌘V") : String(localized: "\(pngs.count) PNGs on the clipboard")
             )
         }
     }
@@ -111,17 +111,17 @@ enum DropAction: CaseIterable {
 
     var title: String {
         switch self {
-        case .tray: "В трей"
-        case .removeBackground: "Убрать фон"
-        case .uninstall: "Удалить приложение"
+        case .tray: String(localized: "To Tray")
+        case .removeBackground: String(localized: "Remove Background")
+        case .uninstall: String(localized: "Uninstall App")
         }
     }
 
     var subtitle: String {
         switch self {
-        case .tray: "Ссылка на файл, сам файл не двигается"
-        case .removeBackground: "PNG без фона — в буфер обмена"
-        case .uninstall: "Покажу файлы — уберёшь в Корзину"
+        case .tray: String(localized: "Keeps a link, the file stays where it is")
+        case .removeBackground: String(localized: "PNG without background, to the clipboard")
+        case .uninstall: String(localized: "Shows its files, you move them to the Trash")
         }
     }
 
@@ -210,7 +210,7 @@ private struct DropHandler: ViewModifier {
                 switch action {
                 case .tray:
                     TrayService.shared.add(providers: providers)
-                    AgentsService.shared.notify(title: "В трее", subtitle: providers.count == 1 ? "1 файл" : "\(providers.count) файлов")
+                    AgentsService.shared.notify(title: String(localized: "In the tray"), subtitle: providers.count == 1 ? String(localized: "1 file") : String(localized: "\(providers.count) files"))
                 case .removeBackground:
                     BackgroundRemover.handle(providers)
                 case .uninstall:

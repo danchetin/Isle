@@ -275,7 +275,7 @@ struct LyricsStack: View {
                     .foregroundStyle(Color.white.opacity(0.8))
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: center ? .top : .topLeading)
             } else {
-                Text(state == .loading ? "Загружаю текст…" : "Текст не найден")
+                Text(state == .loading ? String(localized: "Loading lyrics…") : String(localized: "No lyrics found"))
                     .font(.system(size: fontSize * 0.7, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.45))
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: center ? .center : .leading)

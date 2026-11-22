@@ -1,0 +1,2469 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "": {
+      "shouldTranslate": false
+    },
+    "%.1f of %.0f GB": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$.1f of %2$.0f GB"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%.1f из %.0f ГБ"
+          }
+        }
+      }
+    },
+    "%@ %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ %2$@"
+          }
+        }
+      },
+      "shouldTranslate": false
+    },
+    "%@ %@ → %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ %2$@ → %3$@"
+          }
+        }
+      },
+      "shouldTranslate": false
+    },
+    "%@ %@%%": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ %2$@%%"
+          }
+        }
+      },
+      "shouldTranslate": false
+    },
+    "%@ removed": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ удалён"
+          }
+        }
+      }
+    },
+    "%@ · %lld file(s)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ · %2$lld file(s)"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · %lld файл(ов)"
+          }
+        }
+      }
+    },
+    "%@ · %lld%%": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ · %2$lld%%"
+          }
+        }
+      },
+      "shouldTranslate": false
+    },
+    "%@ · needs permission": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · нужно разрешение"
+          }
+        }
+      }
+    },
+    "%@ · waiting for input": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · ждёт ответа"
+          }
+        }
+      }
+    },
+    "%lld": {
+      "shouldTranslate": false
+    },
+    "%lld PNGs on the clipboard": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld PNG в буфере обмена"
+          }
+        }
+      }
+    },
+    "%lld files": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld файлов"
+          }
+        }
+      }
+    },
+    "%lld items in the Trash": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld объектов в Корзине"
+          }
+        }
+      }
+    },
+    "%lld%%": {
+      "shouldTranslate": false
+    },
+    "%lldd %lldh": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lldd %2$lldh"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldд %lldч"
+          }
+        }
+      }
+    },
+    "%lldh %lldm": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lldh %2$lldm"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldч %lldм"
+          }
+        }
+      }
+    },
+    "%lldm": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldм"
+          }
+        }
+      }
+    },
+    "%lld°": {
+      "shouldTranslate": false
+    },
+    "+%lld": {
+      "shouldTranslate": false
+    },
+    "1 file": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 файл"
+          }
+        }
+      }
+    },
+    "5000  ·  1 usd  ·  100 eur rub  ·  20$ to amd": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5000  ·  1 usd  ·  100 eur rub  ·  20$ в драмах"
+          }
+        }
+      }
+    },
+    "5h": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5ч"
+          }
+        }
+      }
+    },
+    "5h limit": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лимит 5ч"
+          }
+        }
+      }
+    },
+    "5h window not started · today %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Окно 5ч не начато · сегодня %@"
+          }
+        }
+      }
+    },
+    "5h window · %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Окно 5ч · %@"
+          }
+        }
+      }
+    },
+    "Agents": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Агенты"
+          }
+        }
+      }
+    },
+    "Agents: Claude Code Connected": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Агенты: Claude Code подключён"
+          }
+        }
+      }
+    },
+    "All apps to 100%": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все приложения на 100%"
+          }
+        }
+      }
+    },
+    "All day": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Весь день"
+          }
+        }
+      }
+    },
+    "All done for today": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На сегодня всё"
+          }
+        }
+      }
+    },
+    "Allow": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешить"
+          }
+        }
+      }
+    },
+    "Allow Accessibility (Password, HUD)…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешить Универсальный доступ (пароль, HUD)…"
+          }
+        }
+      }
+    },
+    "Allow Isle to control Spotify": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разреши Isle управлять Spotify"
+          }
+        }
+      }
+    },
+    "Allow Spotify Access…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешить доступ к Spotify…"
+          }
+        }
+      }
+    },
+    "App": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приложение"
+          }
+        }
+      }
+    },
+    "Artwork": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обложка"
+          }
+        }
+      }
+    },
+    "Background": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фон"
+          }
+        }
+      }
+    },
+    "Background removed": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фон убран"
+          }
+        }
+      }
+    },
+    "Batteries": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Батареи"
+          }
+        }
+      }
+    },
+    "Black": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чёрный"
+          }
+        }
+      }
+    },
+    "Blurred": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Размытая"
+          }
+        }
+      }
+    },
+    "Cache": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кэш"
+          }
+        }
+      }
+    },
+    "Calendar": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Календарь"
+          }
+        }
+      }
+    },
+    "Calendar access needed": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужен доступ к календарю"
+          }
+        }
+      }
+    },
+    "Calendar events": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "События календаря"
+          }
+        }
+      }
+    },
+    "Card": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Карточка"
+          }
+        }
+      }
+    },
+    "Case": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кейс"
+          }
+        }
+      }
+    },
+    "Choose": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выбрать"
+          }
+        }
+      }
+    },
+    "Claude Code connected": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude Code подключён"
+          }
+        }
+      }
+    },
+    "Claude Code token expired — it refreshes the next time Claude runs": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Токен Claude Code устарел — обновится при следующем запуске Claude"
+          }
+        }
+      }
+    },
+    "Claude finished": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude закончил"
+          }
+        }
+      }
+    },
+    "Claude is waiting for you": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude ждёт тебя"
+          }
+        }
+      }
+    },
+    "Claude plan limits, as in the Claude menu": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лимиты плана Claude, как в меню Claude"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистить"
+          }
+        }
+      }
+    },
+    "Clear sky": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ясно"
+          }
+        }
+      }
+    },
+    "Clear ↔ dark": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прозрачная ↔ тёмная"
+          }
+        }
+      }
+    },
+    "Click to hide lyrics": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажми, чтобы скрыть текст"
+          }
+        }
+      }
+    },
+    "Clipboard": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Буфер"
+          }
+        }
+      }
+    },
+    "Clipboard History": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "История буфера"
+          }
+        }
+      }
+    },
+    "Clipboard — type to search": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Буфер обмена — печатай для поиска"
+          }
+        }
+      }
+    },
+    "Clock": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Часы"
+          }
+        }
+      }
+    },
+    "Clock Depth (subject over the clock)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clock Depth (объект поверх часов)"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закрыть"
+          }
+        }
+      }
+    },
+    "Codex finished": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codex закончил"
+          }
+        }
+      }
+    },
+    "Compact": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Компактные"
+          }
+        }
+      }
+    },
+    "Connect Claude Code from the Isle menu": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключи Claude Code в меню Isle"
+          }
+        }
+      }
+    },
+    "Container": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Контейнер"
+          }
+        }
+      }
+    },
+    "Converter (⌥⇧C)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Конвертер (⌥⇧C)"
+          }
+        }
+      }
+    },
+    "Copied": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скопировано"
+          }
+        }
+      }
+    },
+    "Copy Claude Code Setup Command": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скопировать команду подключения для Claude Code"
+          }
+        }
+      }
+    },
+    "Copy Codex Config": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скопировать конфиг для Codex"
+          }
+        }
+      }
+    },
+    "Couldn't load rates": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось загрузить курсы"
+          }
+        }
+      }
+    },
+    "Couldn't load weather": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось загрузить погоду"
+          }
+        }
+      }
+    },
+    "Couldn't read the usage server's response": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не понял ответ сервера лимитов"
+          }
+        }
+      }
+    },
+    "Currency Converter": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Конвертер валют"
+          }
+        }
+      }
+    },
+    "Custom": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Своё"
+          }
+        }
+      }
+    },
+    "Customize Lock Screen": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настроить экран блокировки"
+          }
+        }
+      }
+    },
+    "Customize Lock Screen…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настроить lock screen…"
+          }
+        }
+      }
+    },
+    "Data": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Данные"
+          }
+        }
+      }
+    },
+    "Delete this page (widgets go back to the palette)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить эту страницу (виджеты вернутся в палитру)"
+          }
+        }
+      }
+    },
+    "Dev build: %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dev-сборка: %@"
+          }
+        }
+      }
+    },
+    "Didn't get that": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не понял запрос"
+          }
+        }
+      }
+    },
+    "Disk": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Диск"
+          }
+        }
+      }
+    },
+    "Doesn't fit — remove another widget": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не помещается — убери другой виджет"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Готово"
+          }
+        }
+      }
+    },
+    "Drag files to the notch": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перетащи файлы к вырезу"
+          }
+        }
+      }
+    },
+    "Drizzle": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Морось"
+          }
+        }
+      }
+    },
+    "Drop a photo or a PNG/JPG/HEIC": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перетащи фото или PNG/JPG/HEIC"
+          }
+        }
+      }
+    },
+    "Empty for now": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока пусто"
+          }
+        }
+      }
+    },
+    "Empty page": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пустая страница"
+          }
+        }
+      }
+    },
+    "Empty page — add widgets from the palette": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пустая страница — добавь виджеты из палитры"
+          }
+        }
+      }
+    },
+    "Files go to the Trash — you can restore them.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файлы уйдут в Корзину — их можно вернуть."
+          }
+        }
+      }
+    },
+    "Fog": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Туман"
+          }
+        }
+      }
+    },
+    "Four rings": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Четыре кольца"
+          }
+        }
+      }
+    },
+    "Free": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Свободно"
+          }
+        }
+      }
+    },
+    "From artwork": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Из обложки"
+          }
+        }
+      }
+    },
+    "Full": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Полный"
+          }
+        }
+      }
+    },
+    "GB": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ГБ"
+          }
+        }
+      }
+    },
+    "Glass": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стекло"
+          }
+        }
+      }
+    },
+    "Group container": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Общий контейнер"
+          }
+        }
+      }
+    },
+    "Heavy rain": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сильный дождь"
+          }
+        }
+      }
+    },
+    "Hidden": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скрыт"
+          }
+        }
+      }
+    },
+    "Hide until the next lock": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скрыть до следующей блокировки"
+          }
+        }
+      }
+    },
+    "History is empty — copy something": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "История пуста — скопируй что-нибудь"
+          }
+        }
+      }
+    },
+    "Hot": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Горячо"
+          }
+        }
+      }
+    },
+    "Image": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Изображение"
+          }
+        }
+      }
+    },
+    "In the tray": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В трее"
+          }
+        }
+      }
+    },
+    "Isle doesn't uninstall itself 🙂": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isle себя не удаляет 🙂"
+          }
+        }
+      }
+    },
+    "Isle won't remove Apple's system apps.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Системные приложения Apple удалять не буду."
+          }
+        }
+      }
+    },
+    "KB/s": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "КБ/с"
+          }
+        }
+      }
+    },
+    "Keeps a link, the file stays where it is": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ссылка на файл, сам файл не двигается"
+          }
+        }
+      }
+    },
+    "L": {
+      "shouldTranslate": false
+    },
+    "Language": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Язык"
+          }
+        }
+      }
+    },
+    "Large": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Большие"
+          }
+        }
+      }
+    },
+    "Large Clock": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Большие часы"
+          }
+        }
+      }
+    },
+    "Launch agent": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Автозапуск"
+          }
+        }
+      }
+    },
+    "Left": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Левый"
+          }
+        }
+      }
+    },
+    "Loading lyrics…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загружаю текст…"
+          }
+        }
+      }
+    },
+    "Loading rates…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загружаю курсы…"
+          }
+        }
+      }
+    },
+    "Lock Screen": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Экран блокировки"
+          }
+        }
+      }
+    },
+    "Lock Screen When Locked": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock screen при блокировке"
+          }
+        }
+      }
+    },
+    "Logs": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Логи"
+          }
+        }
+      }
+    },
+    "Looking for the app's files…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ищу файлы приложения…"
+          }
+        }
+      }
+    },
+    "MB/s": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "МБ/с"
+          }
+        }
+      }
+    },
+    "MCP Tools": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MCP-инструменты"
+          }
+        }
+      }
+    },
+    "Make square": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сделать квадратным"
+          }
+        }
+      }
+    },
+    "Make wide": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сделать широким"
+          }
+        }
+      }
+    },
+    "Match System": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Как в системе"
+          }
+        }
+      }
+    },
+    "Match system": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Как в системе"
+          }
+        }
+      }
+    },
+    "Memory": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Память"
+          }
+        }
+      }
+    },
+    "Message in the notch": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сообщение в вырезе"
+          }
+        }
+      }
+    },
+    "Mostly clear": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Преим. ясно"
+          }
+        }
+      }
+    },
+    "Move to Trash (%@)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В Корзину (%@)"
+          }
+        }
+      }
+    },
+    "Moved to Trash: %lld. Couldn't move: %@ — they need admin rights, delete them in Finder.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Moved to Trash: %1$lld. Couldn't move: %2$@ — they need admin rights, delete them in Finder."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В Корзине: %lld. Не получилось: %@ — нужны права администратора, удали их в Finder."
+          }
+        }
+      }
+    },
+    "Moved to Trash: %lld. You can restore them from the Trash.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В Корзине: %lld. Можно вернуть из Корзины."
+          }
+        }
+      }
+    },
+    "Need an image": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужна картинка"
+          }
+        }
+      }
+    },
+    "Network": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сеть"
+          }
+        }
+      }
+    },
+    "New page": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новая страница"
+          }
+        }
+      }
+    },
+    "No access to app audio: Settings → Privacy & Security → Audio Recording": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет доступа к звуку приложений: Настройки → Конфиденциальность → Запись звука"
+          }
+        }
+      }
+    },
+    "No access: Settings → Privacy & Security → Calendars": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет доступа: Настройки → Конфиденциальность → Календари"
+          }
+        }
+      }
+    },
+    "No agents": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет агентов"
+          }
+        }
+      }
+    },
+    "No agents running": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Агенты сейчас не работают"
+          }
+        }
+      }
+    },
+    "No battery devices": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет устройств с батареей"
+          }
+        }
+      }
+    },
+    "No calendar access": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет доступа к календарю"
+          }
+        }
+      }
+    },
+    "No devices": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет устройств"
+          }
+        }
+      }
+    },
+    "No edits": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Без правок"
+          }
+        }
+      }
+    },
+    "No events today": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сегодня событий нет"
+          }
+        }
+      }
+    },
+    "No location access": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет доступа к геопозиции"
+          }
+        }
+      }
+    },
+    "No lyrics found": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Текст не найден"
+          }
+        }
+      }
+    },
+    "No subject found": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не нашёл объект"
+          }
+        }
+      }
+    },
+    "Normal": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Норма"
+          }
+        }
+      }
+    },
+    "Not running": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас не работают"
+          }
+        }
+      }
+    },
+    "Nothing found": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ничего не найдено"
+          }
+        }
+      }
+    },
+    "Nothing is playing sound": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас звук ничего не играет"
+          }
+        }
+      }
+    },
+    "Nothing playing": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ничего не играет"
+          }
+        }
+      }
+    },
+    "Nothing today": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сегодня без событий"
+          }
+        }
+      }
+    },
+    "Now": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас"
+          }
+        }
+      }
+    },
+    "Now playing": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Что играет"
+          }
+        }
+      }
+    },
+    "On page %lld — click to move it here": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На странице %lld — нажми, чтобы перенести сюда"
+          }
+        }
+      }
+    },
+    "One ring": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Одно кольцо"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть настройки"
+          }
+        }
+      }
+    },
+    "Open Spotify": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть Spotify"
+          }
+        }
+      }
+    },
+    "Open at Login": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запускать при входе"
+          }
+        }
+      }
+    },
+    "Overcast": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пасмурно"
+          }
+        }
+      }
+    },
+    "Overheating": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перегрев"
+          }
+        }
+      }
+    },
+    "PNG on the clipboard — paste with ⌘V": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PNG в буфере обмена — вставляй ⌘V"
+          }
+        }
+      }
+    },
+    "PNG without background, to the clipboard": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PNG без фона — в буфер обмена"
+          }
+        }
+      }
+    },
+    "Partly cloudy": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перем. облачность"
+          }
+        }
+      }
+    },
+    "Paste with ⌘V (auto-paste needs Accessibility)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вставь ⌘V (для автовставки нужен Универсальный доступ)"
+          }
+        }
+      }
+    },
+    "Player": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плеер"
+          }
+        }
+      }
+    },
+    "Player in the Notch": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плеер в вырезе"
+          }
+        }
+      }
+    },
+    "Preferences": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройки"
+          }
+        }
+      }
+    },
+    "Preview Lock Screen": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Превью lock screen"
+          }
+        }
+      }
+    },
+    "Quit": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Завершить"
+          }
+        }
+      }
+    },
+    "Quit Isle": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти из Isle"
+          }
+        }
+      }
+    },
+    "Rain": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дождь"
+          }
+        }
+      }
+    },
+    "Rates": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Курсы"
+          }
+        }
+      }
+    },
+    "Reduce Transparency is on — glass is opaque": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включено «Уменьшить прозрачность» — стекло непрозрачное"
+          }
+        }
+      }
+    },
+    "Regular": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обычный"
+          }
+        }
+      }
+    },
+    "Remove Background": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Убрать фон"
+          }
+        }
+      }
+    },
+    "Remove from tray (the file stays where it is)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Убрать из трея (файл останется на месте)"
+          }
+        }
+      }
+    },
+    "Right": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Правый"
+          }
+        }
+      }
+    },
+    "Rounded": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Округлый"
+          }
+        }
+      }
+    },
+    "Scripts": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скрипты"
+          }
+        }
+      }
+    },
+    "Settings → Privacy & Security → Automation": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройки → Конфиденциальность → Автоматизация"
+          }
+        }
+      }
+    },
+    "Show in Finder": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Показать в Finder"
+          }
+        }
+      }
+    },
+    "Show lyrics by default": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тексты песен по умолчанию"
+          }
+        }
+      }
+    },
+    "Showers": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ливень"
+          }
+        }
+      }
+    },
+    "Shows its files, you move them to the Trash": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Покажу файлы — уберёшь в Корзину"
+          }
+        }
+      }
+    },
+    "Sign in to Claude Code to see plan limits": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Войди в Claude Code, чтобы видеть лимиты плана"
+          }
+        }
+      }
+    },
+    "Snow": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Снег"
+          }
+        }
+      }
+    },
+    "Snowfall": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Снегопад"
+          }
+        }
+      }
+    },
+    "Spotify controls": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Управление Spotify"
+          }
+        }
+      }
+    },
+    "Spotify isn't running": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spotify не запущен"
+          }
+        }
+      }
+    },
+    "Spotify: nothing playing": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spotify: ничего не играет"
+          }
+        }
+      }
+    },
+    "System": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Система"
+          }
+        }
+      }
+    },
+    "System stats": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Статистика системы"
+          }
+        }
+      }
+    },
+    "Temperature": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Температура"
+          }
+        }
+      }
+    },
+    "The app is running — quit it before uninstalling.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приложение запущено — закрой его перед удалением."
+          }
+        }
+      }
+    },
+    "Thin": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тонкий"
+          }
+        }
+      }
+    },
+    "Thinking…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Думает…"
+          }
+        }
+      }
+    },
+    "This week": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "За неделю"
+          }
+        }
+      }
+    },
+    "Thunderstorm": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Гроза"
+          }
+        }
+      }
+    },
+    "Time until the window resets": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Окно сбросится через это время"
+          }
+        }
+      }
+    },
+    "Tinted": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тонированное"
+          }
+        }
+      }
+    },
+    "To Tray": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В трей"
+          }
+        }
+      }
+    },
+    "Touch ID or Enter Password": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch ID или введите пароль"
+          }
+        }
+      }
+    },
+    "Transparent": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прозрачное"
+          }
+        }
+      }
+    },
+    "Tray": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Трей"
+          }
+        }
+      }
+    },
+    "Tray · %lld": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Трей · %lld"
+          }
+        }
+      }
+    },
+    "Try a photo with a clear subject": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Попробуй фото с чётким объектом"
+          }
+        }
+      }
+    },
+    "Try again": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё раз"
+          }
+        }
+      }
+    },
+    "Type an amount and currencies. No currency means AMD.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пиши сумму и валюты. Без валюты — драмы."
+          }
+        }
+      }
+    },
+    "Uninstall App": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить приложение"
+          }
+        }
+      }
+    },
+    "Uninstall an App…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить приложение…"
+          }
+        }
+      }
+    },
+    "Uninstall “%@”": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить «%@»"
+          }
+        }
+      }
+    },
+    "Untitled": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Без названия"
+          }
+        }
+      }
+    },
+    "Usage in the current 5-hour window compared with the week's biggest window (%@). Today in total: %@.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Usage in the current 5-hour window compared with the week's biggest window (%1$@). Today in total: %2$@."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Расход в текущем 5-часовом окне относительно самого большого окна за неделю (%@). Сегодня всего: %@."
+          }
+        }
+      }
+    },
+    "Usage server unavailable (%lld)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер лимитов недоступен (%lld)"
+          }
+        }
+      }
+    },
+    "Volume": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Громкость"
+          }
+        }
+      }
+    },
+    "Volume & Brightness HUD": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HUD громкости и яркости"
+          }
+        }
+      }
+    },
+    "W%lld": {
+      "shouldTranslate": false
+    },
+    "Waiting for the next task": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ждёт следующей задачи"
+          }
+        }
+      }
+    },
+    "Waiting for you": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ждёт тебя"
+          }
+        }
+      }
+    },
+    "Warm": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тепло"
+          }
+        }
+      }
+    },
+    "Weather": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Погода"
+          }
+        }
+      }
+    },
+    "Weather needs your location": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужна геопозиция для погоды"
+          }
+        }
+      }
+    },
+    "Web data": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Веб-данные"
+          }
+        }
+      }
+    },
+    "Which app do you want to remove along with its files?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Какое приложение удалить вместе с его файлами?"
+          }
+        }
+      }
+    },
+    "White": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Белый"
+          }
+        }
+      }
+    },
+    "Widgets under the clock · %lld/%lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Widgets under the clock · %1$lld/%2$lld"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Виджеты под часами · %lld/%lld"
+          }
+        }
+      }
+    },
+    "Window free": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Окно свободно"
+          }
+        }
+      }
+    },
+    "Window state": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Состояние окон"
+          }
+        }
+      }
+    },
+    "Wk": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нед."
+          }
+        }
+      }
+    },
+    "Working": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Работает"
+          }
+        }
+      }
+    },
+    "Working…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Работает…"
+          }
+        }
+      }
+    },
+    "all day": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "весь день"
+          }
+        }
+      }
+    },
+    "by name — double-check": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "по имени — проверь"
+          }
+        }
+      }
+    },
+    "free": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "свободно"
+          }
+        }
+      }
+    },
+    "graphics": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "видеочип"
+          }
+        }
+      }
+    },
+    "load": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "загрузка"
+          }
+        }
+      }
+    },
+    "macOS: %lld%% (Settings → Appearance → Liquid Glass)": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS: %lld%% (Настройки → Оформление → Liquid Glass)"
+          }
+        }
+      }
+    },
+    "of %lld GB": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "из %lld ГБ"
+          }
+        }
+      }
+    },
+    "—": {
+      "shouldTranslate": false
+    },
+    "↑%lld° ↓%lld°": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "↑%1$lld° ↓%2$lld°"
+          }
+        }
+      },
+      "shouldTranslate": false
+    },
+    "↩︎": {
+      "shouldTranslate": false
+    },
+    "↻ %@": {
+      "shouldTranslate": false
+    },
+    "−%lld": {
+      "shouldTranslate": false
+    },
+    "⌥⇧V": {
+      "shouldTranslate": false
+    }
+  },
+  "version": "1.0"
+}

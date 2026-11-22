@@ -147,13 +147,13 @@ final class AgentsService: ObservableObject {
             s.state = .waiting
             let message = p["message"] as? String ?? ""
             s.message = message
-            showToast(AgentToast(kind: .claude, title: "Claude ждёт тебя", subtitle: Self.shortReason(message, project: project), state: .waiting))
+            showToast(AgentToast(kind: .claude, title: String(localized: "Claude is waiting for you"), subtitle: Self.shortReason(message, project: project), state: .waiting))
         case "Stop":
             s.state = .done
             for i in s.steps.indices { s.steps[i].running = false }
             let edits = s.steps.filter { $0.file != nil && ($0.plus > 0 || $0.minus > 0) }
-            let summary = edits.isEmpty ? project : "\(project) · \(Set(edits.compactMap(\.file)).count) файл(ов)"
-            showToast(AgentToast(kind: .claude, title: "Claude закончил", subtitle: summary, state: .done))
+            let summary = edits.isEmpty ? project : String(localized: "\(project) · \(Set(edits.compactMap(\.file)).count) file(s)")
+            showToast(AgentToast(kind: .claude, title: String(localized: "Claude finished"), subtitle: summary, state: .done))
         case "SessionStart":
             s.state = .done
         default:
@@ -175,13 +175,13 @@ final class AgentsService: ObservableObject {
         s.updated = Date()
         sessions.removeAll { $0.id == id }
         sessions.insert(s, at: 0)
-        showToast(AgentToast(kind: .codex, title: "Codex закончил", subtitle: project, state: .done))
+        showToast(AgentToast(kind: .codex, title: String(localized: "Codex finished"), subtitle: project, state: .done))
     }
 
     private static func shortReason(_ message: String, project: String) -> String {
         let m = message.lowercased()
-        if m.contains("permission") { return "\(project) · нужно разрешение" }
-        if m.contains("waiting") || m.contains("input") { return "\(project) · ждёт ответа" }
+        if m.contains("permission") { return String(localized: "\(project) · needs permission") }
+        if m.contains("waiting") || m.contains("input") { return String(localized: "\(project) · waiting for input") }
         return project
     }
 

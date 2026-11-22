@@ -73,7 +73,7 @@ final class CalendarService: ObservableObject {
             .map { e in
                 CalEvent(
                     id: e.eventIdentifier ?? UUID().uuidString,
-                    title: (e.title?.isEmpty == false ? e.title! : "Без названия"),
+                    title: (e.title?.isEmpty == false ? e.title! : String(localized: "Untitled")),
                     start: e.startDate,
                     end: e.endDate,
                     allDay: e.isAllDay,

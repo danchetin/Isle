@@ -16,19 +16,19 @@ struct CleanerItem: Identifiable, Equatable {
 enum CleanerScanner {
     /// (folder in ~/Library, label, match by app name too)
     private static let places: [(String, String, Bool)] = [
-        ("Application Support", "Данные", true),
-        ("Caches", "Кэш", true),
-        ("Preferences", "Настройки", false),
-        ("Preferences/ByHost", "Настройки", false),
-        ("Containers", "Контейнер", false),
-        ("Group Containers", "Общий контейнер", false),
-        ("Saved Application State", "Состояние окон", false),
-        ("Logs", "Логи", true),
-        ("HTTPStorages", "Веб-данные", false),
-        ("WebKit", "Веб-данные", false),
+        ("Application Support", String(localized: "Data"), true),
+        ("Caches", String(localized: "Cache"), true),
+        ("Preferences", String(localized: "Preferences"), false),
+        ("Preferences/ByHost", String(localized: "Preferences"), false),
+        ("Containers", String(localized: "Container"), false),
+        ("Group Containers", String(localized: "Group container"), false),
+        ("Saved Application State", String(localized: "Window state"), false),
+        ("Logs", String(localized: "Logs"), true),
+        ("HTTPStorages", String(localized: "Web data"), false),
+        ("WebKit", String(localized: "Web data"), false),
         ("Cookies", "Cookies", false),
-        ("LaunchAgents", "Автозапуск", false),
-        ("Application Scripts", "Скрипты", false),
+        ("LaunchAgents", String(localized: "Launch agent"), false),
+        ("Application Scripts", String(localized: "Scripts"), false),
     ]
 
     static func scan(app: URL) -> (bundleID: String?, items: [CleanerItem]) {
@@ -39,7 +39,7 @@ enum CleanerScanner {
         let fm = FileManager.default
         let library = fm.homeDirectoryForCurrentUser.appendingPathComponent("Library")
 
-        var items = [CleanerItem(id: app, kind: "Приложение", byName: false, selected: true)]
+        var items = [CleanerItem(id: app, kind: String(localized: "App"), byName: false, selected: true)]
         for (folder, label, matchName) in places {
             let dir = library.appendingPathComponent(folder)
             guard let entries = try? fm.contentsOfDirectory(atPath: dir.path) else { continue }
@@ -73,8 +73,8 @@ enum CleanerScanner {
     /// Apple's own apps and Isle are never offered for removal.
     static func refusal(for app: URL) -> String? {
         let id = Bundle(url: app)?.bundleIdentifier ?? ""
-        if app.path.hasPrefix("/System/") || id.hasPrefix("com.apple.") { return "Системные приложения Apple удалять не буду." }
-        if id == Bundle.main.bundleIdentifier { return "Isle себя не удаляет 🙂" }
+        if app.path.hasPrefix("/System/") || id.hasPrefix("com.apple.") { return String(localized: "Isle won't remove Apple's system apps.") }
+        if id == Bundle.main.bundleIdentifier { return String(localized: "Isle doesn't uninstall itself 🙂") }
         return nil
     }
 }
@@ -129,11 +129,11 @@ final class CleanerModel: ObservableObject {
         }
         items.removeAll { $0.selected && !failed.contains($0.url.lastPathComponent) }
         if failed.isEmpty {
-            result = "В Корзине: \(moved). Можно вернуть из Корзины."
+            result = String(localized: "Moved to Trash: \(moved). You can restore them from the Trash.")
         } else {
-            result = "В Корзине: \(moved). Не получилось: \(failed.joined(separator: ", ")) — нужны права администратора, удали их в Finder."
+            result = String(localized: "Moved to Trash: \(moved). Couldn't move: \(failed.joined(separator: ", ")) — they need admin rights, delete them in Finder.")
         }
-        AgentsService.shared.notify(title: "\(name) удалён", subtitle: "\(moved) объектов в Корзине")
+        AgentsService.shared.notify(title: String(localized: "\(name) removed"), subtitle: String(localized: "\(moved) items in the Trash"))
     }
 }
 
@@ -165,17 +165,17 @@ struct CleanerView: View {
             } else if model.scanning {
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
-                    Text("Ищу файлы приложения…").foregroundStyle(.secondary)
+                    Text("Looking for the app's files…").foregroundStyle(.secondary)
                 }
                 Spacer()
             } else {
                 if model.runningApp != nil {
                     HStack {
                         Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow)
-                        Text("Приложение запущено — закрой его перед удалением.")
+                        Text("The app is running — quit it before uninstalling.")
                             .font(.system(size: 12, weight: .medium))
                         Spacer()
-                        Button("Завершить") { model.quitApp() }
+                        Button("Quit") { model.quitApp() }
                     }
                     .padding(10)
                     .background(RoundedRectangle(cornerRadius: 10).fill(Color.yellow.opacity(0.12)))
@@ -192,7 +192,7 @@ struct CleanerView: View {
                                 HStack(spacing: 6) {
                                     Text(item.kind).font(.system(size: 12, weight: .semibold))
                                     if item.byName {
-                                        Text("по имени — проверь")
+                                        Text("by name — double-check")
                                             .font(.system(size: 10, weight: .semibold))
                                             .foregroundStyle(.orange)
                                     }
@@ -213,7 +213,7 @@ struct CleanerView: View {
                                 Image(systemName: "magnifyingglass")
                             }
                             .buttonStyle(.borderless)
-                            .help("Показать в Finder")
+                            .help("Show in Finder")
                         }
                     }
                 }
@@ -226,12 +226,12 @@ struct CleanerView: View {
                 }
 
                 HStack {
-                    Text("Файлы уйдут в Корзину — их можно вернуть.")
+                    Text("Files go to the Trash — you can restore them.")
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Button("Закрыть", action: close)
-                    Button("В Корзину (\(formatBytes(model.selectedSize)))") { model.moveToTrash() }
+                    Button("Close", action: close)
+                    Button("Move to Trash (\(formatBytes(model.selectedSize)))") { model.moveToTrash() }
                         .buttonStyle(.borderedProminent)
                         .tint(.red)
                         .disabled(model.selectedSize == 0 && !model.items.contains(where: \.selected) || model.runningApp != nil)
@@ -253,8 +253,8 @@ enum CleanerWindows {
         panel.directoryURL = URL(fileURLWithPath: "/Applications")
         panel.allowedContentTypes = [.application]
         panel.allowsMultipleSelection = false
-        panel.prompt = "Выбрать"
-        panel.message = "Какое приложение удалить вместе с его файлами?"
+        panel.prompt = String(localized: "Choose")
+        panel.message = String(localized: "Which app do you want to remove along with its files?")
         NSApp.activate(ignoringOtherApps: true)
         guard panel.runModal() == .OK, let url = panel.url else { return }
         open(app: url)
@@ -268,7 +268,7 @@ enum CleanerWindows {
             backing: .buffered,
             defer: false
         )
-        window.title = "Удалить «\(model.name)»"
+        window.title = String(localized: "Uninstall “\(model.name)”")
         window.isReleasedWhenClosed = false
         window.contentView = NSHostingView(rootView: CleanerView(model: model) { [weak window] in window?.close() })
         window.center()

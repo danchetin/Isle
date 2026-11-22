@@ -18,16 +18,16 @@ enum ShelfWidget: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .nowPlaying: "Плеер"
-        case .calendar: "Календарь"
-        case .weather: "Погода"
-        case .systemStats: "Система"
-        case .batteries: "Батареи"
-        case .agents: "Агенты"
-        case .mixer: "Громкость"
-        case .clipboard: "Буфер"
-        case .tray: "Трей"
-        case .currency: "Курсы"
+        case .nowPlaying: String(localized: "Player")
+        case .calendar: String(localized: "Calendar")
+        case .weather: String(localized: "Weather")
+        case .systemStats: String(localized: "System")
+        case .batteries: String(localized: "Batteries")
+        case .agents: String(localized: "Agents")
+        case .mixer: String(localized: "Volume")
+        case .clipboard: String(localized: "Clipboard")
+        case .tray: String(localized: "Tray")
+        case .currency: String(localized: "Rates")
         }
     }
 

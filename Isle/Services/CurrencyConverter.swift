@@ -20,6 +20,11 @@ enum CurrencyQueryParser {
         "₾": "gel", "лари": "gel",
         "¥": "cny", "юань": "cny", "юаней": "cny",
         "₸": "kzt", "тенге": "kzt",
+        // English words
+        "dollar": "usd", "dollars": "usd", "bucks": "usd", "euro": "eur", "euros": "eur",
+        "ruble": "rub", "rubles": "rub", "rouble": "rub", "roubles": "rub", "dram": "amd", "drams": "amd",
+        "bitcoin": "btc", "bitcoins": "btc", "pound": "gbp", "pounds": "gbp", "gbp": "gbp",
+        "lari": "gel", "gel": "gel", "yuan": "cny", "cny": "cny", "tenge": "kzt", "kzt": "kzt",
     ]
     private static let separators: Set<String> = ["/", "в", "во", "to", "in", "=", "→", "->", "на"]
 
@@ -157,7 +162,7 @@ final class CurrencyConverterPanel {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(plain, forType: .string)
         close()
-        AgentsService.shared.notify(title: "\(plain) \(CurrencyQueryParser.symbol(code))", subtitle: "Скопировано")
+        AgentsService.shared.notify(title: "\(plain) \(CurrencyQueryParser.symbol(code))", subtitle: String(localized: "Copied"))
     }
 }
 
@@ -174,7 +179,7 @@ struct CurrencyConverterView: View {
                 Image(systemName: "dollarsign.arrow.circlepath")
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(Color(red: 0.4, green: 0.85, blue: 0.55))
-                TextField("5000  ·  1 usd  ·  100 eur rub  ·  20$ в драмах", text: $model.text)
+                TextField("5000  ·  1 usd  ·  100 eur rub  ·  20$ to amd", text: $model.text)
                     .textFieldStyle(.plain)
                     .font(.system(size: 22, weight: .medium))
                     .focused($focused)
@@ -184,10 +189,10 @@ struct CurrencyConverterView: View {
             if rates.latestRates.isEmpty {
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
-                    Text("Загружаю курсы…").foregroundStyle(.white.opacity(0.5))
+                    Text("Loading rates…").foregroundStyle(.white.opacity(0.5))
                 }
             } else if results.isEmpty {
-                Text(model.text.isEmpty ? "Пиши сумму и валюты. Без валюты — драмы." : "Не понял запрос")
+                Text(model.text.isEmpty ? String(localized: "Type an amount and currencies. No currency means AMD.") : String(localized: "Didn't get that"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white.opacity(0.45))
             } else {

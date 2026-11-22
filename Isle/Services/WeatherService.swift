@@ -152,7 +152,7 @@ final class WeatherService: NSObject, ObservableObject, CLLocationManagerDelegat
         labeler.setLocalizedDateFormatFromTemplate("j")
         labeler.dateFormat = labeler.dateFormat.contains("a") ? "h a" : "HH:mm"
 
-        var hours = [WeatherHour(id: 0, label: "Сейчас", temp: Int(r.current.temperature_2m.rounded()),
+        var hours = [WeatherHour(id: 0, label: String(localized: "Now"), temp: Int(r.current.temperature_2m.rounded()),
                                  code: r.current.weather_code, isDay: r.current.is_day == 1)]
         let now = Date()
         for (i, t) in r.hourly.time.enumerated() where hours.count < 4 {
@@ -199,18 +199,18 @@ extension Array {
 enum WeatherInfo {
     static func text(_ code: Int) -> String {
         switch code {
-        case 0: "Ясно"
-        case 1: "Преим. ясно"
-        case 2: "Перем. облачность"
-        case 3: "Пасмурно"
-        case 45, 48: "Туман"
-        case 51...57: "Морось"
-        case 61, 63, 66: "Дождь"
-        case 65, 67: "Сильный дождь"
-        case 71...77: "Снег"
-        case 80...82: "Ливень"
-        case 85, 86: "Снегопад"
-        case 95...99: "Гроза"
+        case 0: String(localized: "Clear sky")
+        case 1: String(localized: "Mostly clear")
+        case 2: String(localized: "Partly cloudy")
+        case 3: String(localized: "Overcast")
+        case 45, 48: String(localized: "Fog")
+        case 51...57: String(localized: "Drizzle")
+        case 61, 63, 66: String(localized: "Rain")
+        case 65, 67: String(localized: "Heavy rain")
+        case 71...77: String(localized: "Snow")
+        case 80...82: String(localized: "Showers")
+        case 85, 86: String(localized: "Snowfall")
+        case 95...99: String(localized: "Thunderstorm")
         default: "—"
         }
     }
