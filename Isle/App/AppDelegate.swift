@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var lock: LockScreenController!
     private var notch: NotchController!
     private var hud: HUDController!
+    private var socketServer: IsleSocketServer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Prefs.register()
@@ -23,6 +24,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         notch.start()
         hud = HUDController(model: notch.model)
         hud.start()
+
+        // Local socket: coding-agent hook events (and later MCP requests).
+        HookInstaller.writeShim()
+        let server = IsleSocketServer { request, reply in
+            let type = (try? JSONSerialization.jsonObject(with: request) as? [String: Any])?["type"] as? String
+            switch type {
+            case "status":
+                let agents = AgentsService.shared
+                let status: [String: Any] = [
+                    "sessions": agents.sessions.count,
+                    "active": agents.active?.currentStep?.title ?? "",
+                    "state": agents.active.map { "\($0.state)" } ?? "none",
+                ]
+                reply(try? JSONSerialization.data(withJSONObject: status))
+            default:
+                AgentsService.shared.handle(request)
+                reply(nil)
+            }
+        }
+        server.start()
+        socketServer = server
         setupStatusItem()
     }
 
@@ -57,6 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(toggle("Большие часы", Prefs.clockStyle == .large, #selector(toggleClockStyle)))
         menu.addItem(toggle("Плеер в вырезе", Prefs.notchEnabled, #selector(toggleNotch)))
         menu.addItem(toggle("HUD громкости и яркости", Prefs.hudEnabled, #selector(toggleHUD)))
+        menu.addItem(toggle("Агенты: Claude Code подключён", HookInstaller.claudeInstalled, #selector(toggleClaudeHooks)))
 
         if !LoginwindowPasswordField.trusted {
             menu.addItem(.separator())
@@ -97,6 +120,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func openAutomationSettings() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation") {
             NSWorkspace.shared.open(url)
+        }
+    }
+
+    @objc private func toggleClaudeHooks() {
+        do {
+            if HookInstaller.claudeInstalled { try HookInstaller.uninstallClaude() } else { try HookInstaller.installClaude() }
+        } catch {
+            IsleLog.write("hooks: \(error.localizedDescription)")
         }
     }
 

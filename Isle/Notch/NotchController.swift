@@ -65,6 +65,9 @@ enum NotchMetrics {
     static let ear: CGFloat = 8
     /// Width added on each side of the notch by the volume / brightness HUD.
     static let hudSide: CGFloat = 100
+    /// Agent toast: wider island grown downward.
+    static let toastSide: CGFloat = 110
+    static let toastExtraHeight: CGFloat = 44
     static let panelSize = CGSize(width: 1200, height: 520)
 
     static let cardHeight: CGFloat = 168
@@ -104,6 +107,12 @@ enum NotchMetrics {
         }
         if model.hud != nil {
             return CGSize(width: n.width + hudSide * 2 + ear * 2, height: n.height)
+        }
+        if AgentsService.shared.toast != nil {
+            return CGSize(width: n.width + toastSide * 2 + ear * 2, height: n.height + toastExtraHeight)
+        }
+        if AgentsService.shared.active != nil {
+            return CGSize(width: n.width + liveSide(notchHeight: n.height) * 2 + ear * 2, height: n.height)
         }
         if isLive(model: model, playing: playing, hasTrack: hasTrack) {
             return CGSize(width: n.width + liveSide(notchHeight: n.height) * 2 + ear * 2, height: n.height)

@@ -6,6 +6,20 @@ enum IsleMain {
 
     static func main() {
         let args = CommandLine.arguments
+        // Hook forwarder first: must stay fast and never touch AppKit.
+        if let i = args.firstIndex(of: "--hook") {
+            HookClient.run(arguments: Array(args[(i + 1)...]))
+        }
+        if args.contains("--install-hooks") {
+            do {
+                MainActor.assumeIsolated { HookInstaller.writeShim() }
+                try HookInstaller.installClaude()
+                print("installed: \(HookInstaller.claudeInstalled)")
+            } catch {
+                print("failed: \(error)")
+            }
+            return
+        }
         if args.contains("--uitest") {
             MainActor.assumeIsolated { UITestRunner.run() }
             return

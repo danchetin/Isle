@@ -33,6 +33,7 @@ struct NotchShape: Shape {
 struct NotchRootView: View {
     @ObservedObject var model: NotchModel
     @ObservedObject var spotify: SpotifyController
+    @ObservedObject private var agents = AgentsService.shared
 
     private let spring = Animation.spring(response: 0.42, dampingFraction: 0.82)
 
@@ -41,7 +42,9 @@ struct NotchRootView: View {
         let live = NotchMetrics.isLive(model: model, playing: spotify.isPlaying, hasTrack: hasTrack)
         let size = NotchMetrics.size(model: model, playing: spotify.isPlaying, hasTrack: hasTrack)
         let ear = NotchMetrics.ear
-        let shape = NotchShape(topRadius: ear, bottomRadius: model.expanded ? 32 : 11)
+        let toast = !model.expanded && model.hud == nil ? agents.toast : nil
+        let agent = !model.expanded && model.hud == nil && toast == nil ? agents.active : nil
+        let shape = NotchShape(topRadius: ear, bottomRadius: model.expanded ? 32 : (toast != nil ? 18 : 11))
 
         VStack(spacing: 8) {
             ZStack(alignment: .top) {
@@ -52,6 +55,12 @@ struct NotchRootView: View {
                             .transition(.opacity.combined(with: .scale(scale: 0.94, anchor: .top)))
                     } else if let hud = model.hud {
                         NotchHUDView(info: hud, notchHeight: model.notchSize.height)
+                            .transition(.opacity)
+                    } else if let toast {
+                        NotchToastView(toast: toast, notchHeight: model.notchSize.height)
+                            .transition(.opacity)
+                    } else if let agent {
+                        NotchAgentLiveView(session: agent, notchHeight: model.notchSize.height)
                             .transition(.opacity)
                     } else {
                         NotchLiveView(model: model, spotify: spotify, live: live)
@@ -77,6 +86,8 @@ struct NotchRootView: View {
         .animation(spring, value: model.sizes)
         .animation(spring, value: live)
         .animation(spring, value: model.hud?.kind)
+        .animation(spring, value: agents.toast)
+        .animation(spring, value: agents.active?.id)
         .environment(\.colorScheme, .dark)
     }
 }

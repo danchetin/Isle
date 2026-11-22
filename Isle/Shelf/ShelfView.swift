@@ -129,6 +129,8 @@ struct ShelfView: View {
         case (.systemStats, true): SmallStatsCard(stats: SystemStatsService.shared)
         case (.batteries, false): BatteriesCard(batteries: BatteryService.shared)
         case (.batteries, true): SmallBatteriesCard(batteries: BatteryService.shared)
+        case (.agents, false): AgentsCard(agents: AgentsService.shared)
+        case (.agents, true): SmallAgentsCard(agents: AgentsService.shared)
         }
     }
 }

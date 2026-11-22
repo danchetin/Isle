@@ -101,6 +101,38 @@ enum SnapshotRunner {
             }, size: CGSize(width: 900, height: 300), name: "notch-quad.png", dir: outDir)
             SmallStatsStyle.current = savedStyle
 
+            // Agents: collapsed live activity, toast, shelf cards.
+            var session = AgentSession(id: "demo", kind: .claude, project: "Isle")
+            session.steps = [
+                AgentStep(id: "1", tool: "Read", title: "Read Notes.md", symbol: "doc.text", file: nil, plus: 0, minus: 0, running: false),
+                AgentStep(id: "2", tool: "Grep", title: "Search NotchShape", symbol: "magnifyingglass", file: nil, plus: 0, minus: 0, running: false),
+                AgentStep(id: "3", tool: "Edit", title: "Edit Hero.swift", symbol: "pencil", file: "Hero.swift", plus: 22, minus: 5, running: true),
+            ]
+            AgentsService.shared.debugInject([session])
+            let agentModel = NotchModel()
+            agentModel.notchSize = notchSize
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: agentModel, spotify: spotify)
+            }, size: CGSize(width: 700, height: 120), name: "notch-agent.png", dir: outDir)
+            AgentsService.shared.debugToast(AgentToast(kind: .claude, title: "Claude закончил", subtitle: "Isle · 1 файл(ов)", state: .done))
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: agentModel, spotify: spotify)
+            }, size: CGSize(width: 700, height: 140), name: "notch-toast.png", dir: outDir)
+            AgentsService.shared.debugToast(nil)
+            let agentShelf = NotchModel()
+            agentShelf.notchSize = notchSize
+            agentShelf.widgets = [.agents, .agents]
+            agentShelf.widgets = [.agents, .nowPlaying]
+            agentShelf.sizes = [.nowPlaying: .small]
+            agentShelf.expanded = true
+            render(ZStack(alignment: .top) {
+                LinearGradient(colors: [Color(red: 0.32, green: 0.36, blue: 0.48), Color(red: 0.2, green: 0.22, blue: 0.3)], startPoint: .top, endPoint: .bottom)
+                NotchRootView(model: agentShelf, spotify: spotify)
+            }, size: CGSize(width: 900, height: 300), name: "notch-agents-shelf.png", dir: outDir)
+            AgentsService.shared.debugInject([])
+
             let hudModel = NotchModel()
             hudModel.notchSize = notchSize
             hudModel.hud = HUDInfo(kind: .volume, level: 0.62)
