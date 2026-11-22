@@ -30,7 +30,9 @@ struct ShelfView: View {
                 }
             }
             .frame(height: list.isEmpty ? NotchMetrics.emptyHeight : NotchMetrics.cardHeight, alignment: .top)
-            .frame(maxWidth: .infinity)
+            // minWidth 0: wider off-screen pages must not widen the shelf (or the palette
+            // below would overflow the island on narrow pages).
+            .frame(minWidth: 0, maxWidth: .infinity)
             if model.editing {
                 ShelfPalette(model: model)
                     .padding(.top, 14)
