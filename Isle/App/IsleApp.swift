@@ -31,6 +31,24 @@ enum IsleMain {
             }
             exit(0)
         }
+        if let i = args.firstIndex(of: "--convert"), i + 1 < args.count {
+            // Parser + conversion check against live rates.
+            let sema = DispatchSemaphore(value: 0)
+            var rates: [String: Double] = [:]
+            URLSession.shared.dataTask(with: URL(string: "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/amd.json")!) { data, _, _ in
+                if let data, let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let r = obj["amd"] as? [String: Double] {
+                    rates = r.merging(["amd": 1]) { a, _ in a }
+                }
+                sema.signal()
+            }.resume()
+            sema.wait()
+            for q in args[(i + 1)...] {
+                guard let parsed = CurrencyQueryParser.parse(q, known: Set(rates.keys)) else { print("\(q) → (не понял)"); continue }
+                let out = CurrencyQueryParser.convert(parsed, rates: rates).map { "\(CurrencyQueryParser.format($0.value)) \($0.code.uppercased())" }
+                print("\(q) → \(parsed.amount) \(parsed.from) → \(out.joined(separator: ", "))")
+            }
+            exit(0)
+        }
         if args.contains("--mcp") {
             McpServer.run()
         }

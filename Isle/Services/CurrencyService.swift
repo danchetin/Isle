@@ -22,6 +22,8 @@ final class CurrencyService: ObservableObject {
     @Published private(set) var quotes: [CurrencyQuote] = []
     @Published private(set) var updated: Date?
     @Published private(set) var failed = false
+    /// Latest "units of X per 1 AMD" for every currency the API knows (converter).
+    @Published private(set) var latestRates: [String: Double] = [:]
 
     private var users = 0
     private var timer: Timer?
@@ -70,6 +72,7 @@ final class CurrencyService: ObservableObject {
                 series = byBack.keys.sorted(by: >).compactMap { byBack[$0] }
             }
             series.append(latest.rates)
+            latestRates = latest.rates.merging(["amd": 1]) { a, _ in a }
             quotes = Self.quotes(from: series)
             updated = Date()
             failed = false
@@ -179,6 +182,14 @@ struct CurrencyCard: View {
                         .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(.white.opacity(0.35))
                 }
+                Button { CurrencyConverterPanel.shared.toggle() } label: {
+                    Image(systemName: "arrow.left.arrow.right")
+                        .font(.system(size: 10, weight: .bold))
+                        .frame(width: 22, height: 22)
+                        .background(Circle().fill(Color.white.opacity(0.12)))
+                }
+                .buttonStyle(PressableStyle())
+                .help("Конвертер (⌥⇧C)")
             }
             if rates.quotes.isEmpty {
                 Group {

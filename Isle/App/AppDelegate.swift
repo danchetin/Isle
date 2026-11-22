@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var hud: HUDController!
     private var socketServer: IsleSocketServer?
     private var clipboardHotKey: GlobalHotKey?
+    private var converterHotKey: GlobalHotKey?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Prefs.register()
@@ -61,6 +62,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             MainActor.assumeIsolated { ClipboardPicker.shared.toggle() }
         }
 
+        converterHotKey = GlobalHotKey(keyCode: UInt32(kVK_ANSI_C), modifiers: UInt32(optionKey | shiftKey), id: 2) {
+            MainActor.assumeIsolated { CurrencyConverterPanel.shared.toggle() }
+        }
+
         // Per-app volumes saved last time (only apps below 100% are touched).
         AudioMixer.shared.start()
         if CommandLine.arguments.contains("--mixer-selftest") { runMixerSelfTest() }
@@ -96,6 +101,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let clip = item("История буфера", #selector(openClipboard), key: "v")
         clip.keyEquivalentModifierMask = [.option, .shift]
         menu.addItem(clip)
+        let conv = item("Конвертер валют", #selector(openConverter), key: "c")
+        conv.keyEquivalentModifierMask = [.option, .shift]
+        menu.addItem(conv)
         menu.addItem(.separator())
         menu.addItem(toggle("Lock screen при блокировке", Prefs.lockScreenEnabled, #selector(toggleLock)))
         menu.addItem(toggle("Clock Depth (объект поверх часов)", Prefs.clockDepth, #selector(toggleDepth)))
@@ -147,6 +155,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func previewLock() { lock.togglePreview() }
     @objc private func openCleaner() { CleanerWindows.chooseApp() }
     @objc private func openClipboard() { ClipboardPicker.shared.toggle() }
+    @objc private func openConverter() { CurrencyConverterPanel.shared.toggle() }
     @objc private func toggleLock() { Prefs.lockScreenEnabled.toggle() }
     @objc private func toggleDepth() { Prefs.clockDepth.toggle() }
     @objc private func toggleClockStyle() { Prefs.clockStyle = Prefs.clockStyle == .large ? .inline : .large }
