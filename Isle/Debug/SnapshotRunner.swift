@@ -58,6 +58,15 @@ enum SnapshotRunner {
             defaults.set("", forKey: LockKey.widgets)
             defaults.set(LockPlayerStyle.full.rawValue, forKey: LockKey.player)
             render(LockScreenView(spotify: spotify, onClose: {}), size: screen, name: "lock-glass.png", dir: outDir)
+            let savedFollow = defaults.object(forKey: GlassSettings.followKey)
+            let savedTint = defaults.object(forKey: GlassSettings.customKey)
+            defaults.set(false, forKey: GlassSettings.followKey)
+            for t in [0.0, 1.0] {
+                defaults.set(t, forKey: GlassSettings.customKey)
+                render(LockClockOnly(spotify: spotify), size: screen, name: "lock-glass-\(Int(t)).png", dir: outDir)
+            }
+            if let savedFollow { defaults.set(savedFollow, forKey: GlassSettings.followKey) } else { defaults.removeObject(forKey: GlassSettings.followKey) }
+            if let savedTint { defaults.set(savedTint, forKey: GlassSettings.customKey) } else { defaults.removeObject(forKey: GlassSettings.customKey) }
             if let savedColor { defaults.set(savedColor, forKey: LockKey.clockColor) } else { defaults.removeObject(forKey: LockKey.clockColor) }
             for (key, value) in zip([LockKey.widgets, LockKey.player, LockKey.clockFont], saved) {
                 if let value { defaults.set(value, forKey: key) } else { defaults.removeObject(forKey: key) }
@@ -309,5 +318,20 @@ enum SnapshotRunner {
         CGImageDestinationAddImage(dest, cg, nil)
         CGImageDestinationFinalize(dest)
         print("wrote \(url.path)")
+    }
+}
+
+/// Backdrop + glass clock only (comparing glass tint levels).
+private struct LockClockOnly: View {
+    @ObservedObject var spotify: SpotifyController
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                ArtBackdrop(artwork: spotify.artwork, size: geo.size)
+                if let art = spotify.artwork {
+                    GlassClock(style: .large, size: geo.size, font: .regular, artwork: art)
+                }
+            }
+        }
     }
 }

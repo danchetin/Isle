@@ -22,23 +22,59 @@ extension EnvironmentValues {
 
 // MARK: - Glass
 
+/// How frosted Isle's glass is: 0 = clear, 1 = fully tinted. Follows the macOS
+/// Appearance → Liquid Glass slider (NSGlassTintAmount) and Reduce Transparency unless
+/// the user picks their own value.
+enum GlassSettings {
+    static let followKey = "glassFollowSystem"
+    static let customKey = "glassTint"
+
+    static var systemTint: Double {
+        let raw = UserDefaults.standard.object(forKey: "NSGlassTintAmount")
+        if let n = raw as? NSNumber { return n.doubleValue }
+        if let s = raw as? String, let d = Double(s) { return d }
+        return 0.5
+    }
+
+    static var reduceTransparency: Bool {
+        NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency
+    }
+
+    static func tint(follow: Bool, custom: Double) -> Double {
+        if reduceTransparency { return 1 }
+        return min(max(follow ? systemTint : custom, 0), 1)
+    }
+}
+
 struct GlassModifier<S: Shape>: ViewModifier {
     let shape: S
     @Environment(\.isSnapshot) private var isSnapshot
+    @AppStorage(GlassSettings.followKey) private var follow = true
+    @AppStorage(GlassSettings.customKey) private var custom = 0.5
 
     func body(content: Content) -> some View {
         if isSnapshot {
             fallback(content)
         } else if #available(macOS 26.0, *) {
-            content.glassEffect(.regular.interactive(), in: shape)
+            content.glassEffect(glass, in: shape)
         } else {
             fallback(content)
         }
     }
 
+    @available(macOS 26.0, *)
+    private var glass: Glass {
+        // Following the system: plain glass, macOS applies its own slider.
+        guard !follow || GlassSettings.reduceTransparency else { return .regular.interactive() }
+        let t = GlassSettings.tint(follow: follow, custom: custom)
+        if t < 0.3 { return .clear.interactive() }
+        return .regular.tint(Color.black.opacity((t - 0.3) * 0.45)).interactive()
+    }
+
     private func fallback(_ content: Content) -> some View {
-        content
-            .background(shape.fill(Color.white.opacity(0.16)))
+        let t = GlassSettings.tint(follow: follow, custom: custom)
+        return content
+            .background(shape.fill(Color.white.opacity(0.08 + 0.16 * t)))
             .overlay(shape.stroke(Color.white.opacity(0.22), lineWidth: 0.5))
     }
 }

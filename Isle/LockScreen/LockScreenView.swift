@@ -250,25 +250,30 @@ struct GlassClock: View {
     let size: CGSize
     let font: LockClockFont
     let artwork: ProcessedArtwork
+    @AppStorage(GlassSettings.followKey) private var follow = true
+    @AppStorage(GlassSettings.customKey) private var custom = 0.5
 
     var body: some View {
+        // t = 0: almost pure refraction of the cover; t = 1: frosted, milky digits.
+        let t = GlassSettings.tint(follow: follow, custom: custom)
         let glyphs = LockClock(style: style, size: size, font: font, color: .white)
         ZStack {
             FillImage(image: artwork.blurred, size: size)
-                .brightness(0.12)
-                .saturation(1.6)
+                .brightness(0.04 + 0.2 * t)
+                .saturation(1.7 - 0.4 * t)
             LinearGradient(
                 stops: [
-                    .init(color: .white.opacity(0.42), location: 0),
-                    .init(color: .white.opacity(0.12), location: 0.28),
-                    .init(color: .white.opacity(0.04), location: 0.6),
+                    .init(color: .white.opacity(0.25 + 0.3 * t), location: 0),
+                    .init(color: .white.opacity(0.06 + 0.12 * t), location: 0.28),
+                    .init(color: .white.opacity(0.02 + 0.1 * t), location: 0.6),
                 ],
                 startPoint: .top,
                 endPoint: .bottom
             )
+            Color.white.opacity(0.3 * t * t) // milkiness at the tinted end
         }
         .mask(glyphs)
-        .overlay(glyphs.opacity(0.1).blendMode(.plusLighter))
+        .overlay(glyphs.opacity(0.05 + 0.1 * t).blendMode(.plusLighter))
         .shadow(color: .black.opacity(0.28), radius: 12, y: 3)
         .allowsHitTesting(false)
     }

@@ -224,6 +224,8 @@ struct LockEditorPanel: View {
     @AppStorage(LockKey.background) private var background = LockBackground.artwork.rawValue
     @AppStorage(LockKey.widgets) private var widgetsRaw = ""
     @AppStorage(LockKey.lyrics) private var lyrics = false
+    @AppStorage(GlassSettings.followKey) private var glassFollow = true
+    @AppStorage(GlassSettings.customKey) private var glassTint = 0.5
 
     var body: some View {
         let widgets = LockWidget.decode(widgetsRaw)
@@ -293,6 +295,29 @@ struct LockEditorPanel: View {
             section("Фон")
             Segmented(options: LockBackground.allCases, title: \.title,
                       selection: Binding(get: { LockBackground(rawValue: background) ?? .artwork }, set: { background = $0.rawValue }))
+
+            section("Стекло")
+            Segmented(options: [true, false], title: { $0 ? "Как в системе" : "Своё" }, selection: $glassFollow)
+            if glassFollow {
+                Text(GlassSettings.reduceTransparency
+                     ? "Включено «Уменьшить прозрачность» — стекло непрозрачное"
+                     : "macOS: \(Int((GlassSettings.systemTint * 100).rounded()))% (Настройки → Оформление → Liquid Glass)")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.5))
+            } else {
+                HStack(spacing: 8) {
+                    Image(systemName: "circle.dashed").font(.system(size: 12, weight: .semibold)).opacity(0.6)
+                    ScrubBar(progress: glassTint, height: 6, live: true) { glassTint = $0 }
+                    Image(systemName: "circle.fill").font(.system(size: 12, weight: .semibold)).opacity(0.6)
+                }
+                HStack {
+                    Text("Прозрачное")
+                    Spacer()
+                    Text("Тонированное")
+                }
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.white.opacity(0.45))
+            }
             Spacer(minLength: 0)
         }
         .foregroundStyle(.white)
