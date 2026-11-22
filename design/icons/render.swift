@@ -386,6 +386,24 @@ func render(_ size: CGFloat, mac: Bool, _ draw: (CGContext) -> Void) -> Data {
     return NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:])!
 }
 
+// `swift render.swift --appicon <AppIcon.appiconset>`: macOS icon set from the chosen concept (7b).
+if CommandLine.arguments.count > 2, CommandLine.arguments[1] == "--appicon" {
+    let dir = URL(fileURLWithPath: CommandLine.arguments[2])
+    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    var images: [String] = []
+    for pt in [16, 32, 128, 256, 512] {
+        for scale in [1, 2] {
+            let name = "icon_\(pt)x\(pt)\(scale == 2 ? "@2x" : "").png"
+            try! render(CGFloat(pt * scale), mac: true, round3Wide).write(to: dir.appendingPathComponent(name))
+            images.append(#"{"filename":"\#(name)","idiom":"mac","scale":"\#(scale)x","size":"\#(pt)x\#(pt)"}"#)
+        }
+    }
+    let json = #"{"images":[\#(images.joined(separator: ","))],"info":{"author":"xcode","version":1}}"#
+    try! json.write(to: dir.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+    print("appicon ok")
+    exit(0)
+}
+
 let out = URL(fileURLWithPath: CommandLine.arguments[1])
 try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
 let concepts: [(String, (CGContext) -> Void)] = [
