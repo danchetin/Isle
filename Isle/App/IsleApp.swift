@@ -10,6 +10,9 @@ enum IsleMain {
         if let i = args.firstIndex(of: "--hook") {
             HookClient.run(arguments: Array(args[(i + 1)...]))
         }
+        if args.contains("--mcp") {
+            McpServer.run()
+        }
         if args.contains("--install-hooks") {
             do {
                 MainActor.assumeIsolated { HookInstaller.writeShim() }

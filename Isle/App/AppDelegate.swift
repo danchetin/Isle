@@ -38,6 +38,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     "state": agents.active.map { "\($0.state)" } ?? "none",
                 ]
                 reply(try? JSONSerialization.data(withJSONObject: status))
+            case "mcp_tools":
+                reply(try? JSONSerialization.data(withJSONObject: McpHandler.enabledTools()))
+            case "mcp_call":
+                let obj = (try? JSONSerialization.jsonObject(with: request) as? [String: Any]) ?? [:]
+                McpHandler.call(obj["tool"] as? String ?? "", args: obj["args"] as? [String: Any] ?? [:]) { result in
+                    reply(try? JSONSerialization.data(withJSONObject: result))
+                }
             default:
                 AgentsService.shared.handle(request)
                 reply(nil)
@@ -80,6 +87,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(toggle("Плеер в вырезе", Prefs.notchEnabled, #selector(toggleNotch)))
         menu.addItem(toggle("HUD громкости и яркости", Prefs.hudEnabled, #selector(toggleHUD)))
         menu.addItem(toggle("Агенты: Claude Code подключён", HookInstaller.claudeInstalled, #selector(toggleClaudeHooks)))
+        let mcpItem = NSMenuItem(title: "MCP-инструменты", action: nil, keyEquivalent: "")
+        let mcpMenu = NSMenu()
+        for tool in McpTool.allCases {
+            let i = NSMenuItem(title: tool.title, action: #selector(toggleMcpTool(_:)), keyEquivalent: "")
+            i.target = self
+            i.representedObject = tool.rawValue
+            i.state = tool.isEnabled ? .on : .off
+            mcpMenu.addItem(i)
+        }
+        mcpMenu.addItem(.separator())
+        mcpMenu.addItem(item("Скопировать команду подключения для Claude Code", #selector(copyClaudeMcpCommand)))
+        mcpMenu.addItem(item("Скопировать конфиг для Codex", #selector(copyCodexMcpConfig)))
+        mcpItem.submenu = mcpMenu
+        menu.addItem(mcpItem)
 
         if !LoginwindowPasswordField.trusted {
             menu.addItem(.separator())
@@ -121,6 +142,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation") {
             NSWorkspace.shared.open(url)
         }
+    }
+
+    @objc private func toggleMcpTool(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String, let tool = McpTool(rawValue: raw) else { return }
+        tool.isEnabled.toggle()
+    }
+
+    @objc private func copyClaudeMcpCommand() {
+        copy("claude mcp add --scope user isle -- \"\(HookInstaller.mcpShimURL.path)\"")
+    }
+
+    @objc private func copyCodexMcpConfig() {
+        copy("[mcp_servers.isle]\ncommand = \"\(HookInstaller.mcpShimURL.path)\"\n")
+    }
+
+    private func copy(_ text: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
     }
 
     @objc private func toggleClaudeHooks() {

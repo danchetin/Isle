@@ -3,11 +3,13 @@ import SwiftUI
 enum AgentKind: String {
     case claude
     case codex
+    case isle
 
     var name: String {
         switch self {
         case .claude: "Claude"
         case .codex: "Codex"
+        case .isle: "Isle"
         }
     }
 
@@ -15,6 +17,7 @@ enum AgentKind: String {
         switch self {
         case .claude: "sparkle"
         case .codex: "chevron.left.forwardslash.chevron.right"
+        case .isle: "bell.fill"
         }
     }
 
@@ -22,6 +25,7 @@ enum AgentKind: String {
         switch self {
         case .claude: Color(red: 0.87, green: 0.49, blue: 0.34)
         case .codex: Color(white: 0.9)
+        case .isle: Color(white: 0.95)
         }
     }
 }
@@ -193,6 +197,11 @@ final class AgentsService: ObservableObject {
         }
         toastWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 4.5, execute: work)
+    }
+
+    /// Message from an MCP client (notch_notify).
+    func notify(title: String, subtitle: String) {
+        showToast(AgentToast(kind: .isle, title: title, subtitle: subtitle, state: .done))
     }
 
     func dismissToast() {

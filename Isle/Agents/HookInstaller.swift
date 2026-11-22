@@ -5,6 +5,7 @@ import Foundation
 /// with `--hook claude`. Other hooks in the file are left alone; a backup is written first.
 enum HookInstaller {
     static var shimURL: URL { IsleSocket.directory.appendingPathComponent("isle-hook") }
+    static var mcpShimURL: URL { IsleSocket.directory.appendingPathComponent("isle-mcp") }
 
     private static var claudeSettingsURL: URL {
         FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude/settings.json")
@@ -19,10 +20,12 @@ enum HookInstaller {
     static func writeShim() {
         guard let exe = Bundle.main.executablePath else { return }
         try? FileManager.default.createDirectory(at: IsleSocket.directory, withIntermediateDirectories: true)
-        let script = "#!/bin/sh\nexec \"\(exe)\" --hook \"$@\"\n"
-        if (try? String(contentsOf: shimURL, encoding: .utf8)) == script { return }
-        try? script.write(to: shimURL, atomically: true, encoding: .utf8)
-        chmod(shimURL.path, 0o755)
+        for (url, flag) in [(shimURL, "--hook"), (mcpShimURL, "--mcp")] {
+            let script = "#!/bin/sh\nexec \"\(exe)\" \(flag) \"$@\"\n"
+            if (try? String(contentsOf: url, encoding: .utf8)) == script { continue }
+            try? script.write(to: url, atomically: true, encoding: .utf8)
+            chmod(url.path, 0o755)
+        }
     }
 
     private static func loadSettings() -> [String: Any] {
