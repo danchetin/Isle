@@ -69,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // Per-app volumes saved last time (only apps below 100% are touched).
         AudioMixer.shared.start()
         if CommandLine.arguments.contains("--mixer-selftest") { runMixerSelfTest() }
+        if CommandLine.arguments.contains("--plan-selftest") { ClaudeUsageService.shared.refreshPlan(force: true) }
         setupStatusItem()
     }
 

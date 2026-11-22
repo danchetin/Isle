@@ -1,4 +1,5 @@
 import Foundation
+import Security
 import SwiftUI
 
 /// Claude Code token usage read from its local transcripts (~/.claude/projects/**/*.jsonl).
@@ -75,6 +76,10 @@ final class ClaudeUsageService: ObservableObject {
     @Published private(set) var peak = 0
     @Published private(set) var today = 0
     @Published private(set) var loaded = false
+    /// Real plan percentages from Anthropic (nil until fetched / when unavailable).
+    @Published private(set) var plan: PlanUsage?
+    @Published private(set) var planNote: String?
+    private var lastPlanFetch = Date.distantPast
 
     private let scanner = ClaudeUsageScanner()
     private var timer: Timer?
@@ -98,7 +103,29 @@ final class ClaudeUsageService: ObservableObject {
         timer = nil
     }
 
+    func refreshPlan(force: Bool = false) {
+        guard force || Date().timeIntervalSince(lastPlanFetch) > 120 else { return }
+        lastPlanFetch = Date()
+        Task {
+            switch await ClaudePlanUsageClient.fetch() {
+            case .success(let usage):
+                plan = usage
+                planNote = nil
+                IsleLog.write("claude plan: 5h=\(usage.fiveHour.map { Int($0.percent) } ?? -1)% week=\(usage.week.map { Int($0.percent) } ?? -1)%")
+            case .failure(let f):
+                planNote = switch f {
+                case .noToken: "Войди в Claude Code, чтобы видеть лимиты плана"
+                case .expired: "Токен Claude Code устарел — обновится при следующем запуске Claude"
+                case .http(let code): "Сервер лимитов недоступен (\(code))"
+                case .format: "Не понял ответ сервера лимитов"
+                }
+                IsleLog.write("claude plan: unavailable (\(f))")
+            }
+        }
+    }
+
     func refresh() {
+        refreshPlan()
         guard !scanning else { return }
         scanning = true
         let scanner = self.scanner
@@ -161,7 +188,10 @@ struct ClaudeUsageBar: View {
     var body: some View {
         TimelineView(.everyMinute) { ctx in
             VStack(alignment: .leading, spacing: 4) {
-                if let w = usage.current {
+                if let plan = usage.plan {
+                    if let h = plan.fiveHour { planRow(compact ? "5ч" : "Лимит 5ч", h, now: ctx.date) }
+                    if let w = plan.week { planRow(compact ? "Нед." : "За неделю", w, now: ctx.date) }
+                } else if let w = usage.current {
                     let fraction = usage.peak > 0 ? Double(w.tokens) / Double(max(usage.peak, w.tokens)) : 0
                     HStack(spacing: 6) {
                         Image(systemName: "hourglass").font(.system(size: 10, weight: .bold))
@@ -199,8 +229,103 @@ struct ClaudeUsageBar: View {
         .onDisappear { if !isSnapshot { usage.deactivate() } }
     }
 
+    private func planRow(_ title: String, _ limit: PlanUsage.Limit, now: Date) -> some View {
+        let fraction = min(max(limit.percent / 100, 0), 1)
+        return VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 6) {
+                Text("\(title) · \(Int(limit.percent.rounded()))%")
+                Spacer(minLength: 4)
+                if let reset = limit.resetsAt {
+                    Text("↻ \(Self.remaining(reset, now: now))")
+                        .foregroundStyle(.white.opacity(0.5))
+                        .lineLimit(1)
+                        .fixedSize()
+                }
+            }
+            .font(.system(size: 11, weight: .semibold).monospacedDigit())
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.white.opacity(0.12))
+                    Capsule()
+                        .fill(fraction > 0.85 ? Color(red: 1, green: 0.42, blue: 0.42) : AgentKind.claude.color)
+                        .frame(width: max(4, geo.size.width * fraction))
+                }
+            }
+            .frame(height: 4)
+        }
+        .help("Лимиты плана Claude, как в меню Claude")
+    }
+
     static func remaining(_ end: Date, now: Date) -> String {
         let mins = max(0, Int(end.timeIntervalSince(now) / 60))
+        if mins >= 48 * 60 { return "\(mins / 1440)д \((mins % 1440) / 60)ч" }
         return mins >= 60 ? "\(mins / 60)ч \(mins % 60)м" : "\(mins)м"
+    }
+}
+
+// MARK: - Real plan usage (same numbers as Claude's own menu)
+
+struct PlanUsage: Equatable {
+    struct Limit: Equatable {
+        let percent: Double   // 0…100
+        let resetsAt: Date?
+    }
+    let fiveHour: Limit?
+    let week: Limit?
+    let fetched: Date
+}
+
+/// Asks Anthropic for the plan's utilisation with Claude Code's own OAuth token, read from the
+/// Keychain item "Claude Code-credentials" (macOS asks the user once). The token is only sent to
+/// api.anthropic.com, never stored, logged or refreshed by Isle. Undocumented endpoint: any
+/// failure falls back to the local estimate.
+enum ClaudePlanUsageClient {
+    enum Failure: Error { case noToken, expired, http(Int), format }
+
+    static func fetch() async -> Result<PlanUsage, Failure> {
+        guard let creds = readCredentials() else { return .failure(.noToken) }
+        if let expiry = creds.expiresAt, expiry < Date() { return .failure(.expired) }
+        var request = URLRequest(url: URL(string: "https://api.anthropic.com/api/oauth/usage")!)
+        request.setValue("Bearer \(creds.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("oauth-2025-04-20", forHTTPHeaderField: "anthropic-beta")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.timeoutInterval = 10
+        guard let (data, response) = try? await URLSession.shared.data(for: request) else { return .failure(.http(0)) }
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard status == 200 else { return .failure(status == 401 ? .expired : .http(status)) }
+        guard let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return .failure(.format) }
+        let usage = PlanUsage(fiveHour: limit(obj["five_hour"]), week: limit(obj["seven_day"]), fetched: Date())
+        return usage.fiveHour == nil && usage.week == nil ? .failure(.format) : .success(usage)
+    }
+
+    private static func limit(_ any: Any?) -> PlanUsage.Limit? {
+        guard let d = any as? [String: Any], let u = (d["utilization"] as? NSNumber)?.doubleValue else { return nil }
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let plain = ISO8601DateFormatter()
+        let reset = (d["resets_at"] as? String).flatMap { iso.date(from: $0) ?? plain.date(from: $0) }
+        return .init(percent: u <= 1 && u > 0 ? u * 100 : u, resetsAt: reset)
+    }
+
+    private struct Credentials {
+        let token: String
+        let expiresAt: Date?
+    }
+
+    private static func readCredentials() -> Credentials? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "Claude Code-credentials",
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne,
+        ]
+        var item: CFTypeRef?
+        guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess,
+              let data = item as? Data,
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let oauth = obj["claudeAiOauth"] as? [String: Any],
+              let token = oauth["accessToken"] as? String, !token.isEmpty else { return nil }
+        let expires = (oauth["expiresAt"] as? NSNumber).map { Date(timeIntervalSince1970: $0.doubleValue / 1000) }
+        return Credentials(token: token, expiresAt: expires)
     }
 }
