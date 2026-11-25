@@ -104,7 +104,7 @@ final class ClaudeUsageService: ObservableObject {
     }
 
     func refreshPlan(force: Bool = false) {
-        guard force || Date().timeIntervalSince(lastPlanFetch) > 120 else { return }
+        guard force || Date().timeIntervalSince(lastPlanFetch) > 300 else { return }
         lastPlanFetch = Date()
         Task {
             switch await ClaudePlanUsageClient.fetch() {
@@ -275,16 +275,26 @@ struct PlanUsage: Equatable {
     let fetched: Date
 }
 
-/// Asks Anthropic for the plan's utilisation with Claude Code's own OAuth token, read from the
-/// Keychain item "Claude Code-credentials" (macOS asks the user once). The token is only sent to
-/// api.anthropic.com, never stored, logged or refreshed by Isle. Undocumented endpoint: any
+/// Asks Anthropic for the plan's utilisation with Claude Code's own OAuth token from the Keychain
+/// item "Claude Code-credentials". The token is only sent to api.anthropic.com, kept in memory
+/// until it expires, never written, logged or refreshed by Isle. Undocumented endpoint: any
 /// failure falls back to the local estimate.
+///
+/// The item is read through /usr/bin/security, the tool Claude Code itself writes it with, so it is
+/// already on the item's access list. Reading it directly made macOS ask for the keychain password
+/// again after every token refresh: Claude Code rewrites the item and "Always Allow" for Isle is lost.
 enum ClaudePlanUsageClient {
     enum Failure: Error { case noToken, expired, http(Int), format }
 
+    /// Last token read; reused until shortly before it expires or the server rejects it.
+    @MainActor private static var cached: Credentials?
+
+    @MainActor
     static func fetch() async -> Result<PlanUsage, Failure> {
-        guard let creds = readCredentials() else { return .failure(.noToken) }
-        if let expiry = creds.expiresAt, expiry < Date() { return .failure(.expired) }
+        if let c = cached, let expiry = c.expiresAt, expiry < Date().addingTimeInterval(60) { cached = nil }
+        if cached == nil { cached = await Task.detached(priority: .utility) { readCredentials() }.value }
+        guard let creds = cached else { return .failure(.noToken) }
+        if let expiry = creds.expiresAt, expiry < Date() { cached = nil; return .failure(.expired) }
         var request = URLRequest(url: URL(string: "https://api.anthropic.com/api/oauth/usage")!)
         request.setValue("Bearer \(creds.token)", forHTTPHeaderField: "Authorization")
         request.setValue("oauth-2025-04-20", forHTTPHeaderField: "anthropic-beta")
@@ -292,6 +302,7 @@ enum ClaudePlanUsageClient {
         request.timeoutInterval = 10
         guard let (data, response) = try? await URLSession.shared.data(for: request) else { return .failure(.http(0)) }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if status == 401 { cached = nil }
         guard status == 200 else { return .failure(status == 401 ? .expired : .http(status)) }
         guard let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return .failure(.format) }
         let usage = PlanUsage(fiveHour: limit(obj["five_hour"]), week: limit(obj["seven_day"]), fetched: Date())
@@ -307,21 +318,37 @@ enum ClaudePlanUsageClient {
         return .init(percent: u <= 1 && u > 0 ? u * 100 : u, resetsAt: reset)
     }
 
-    private struct Credentials {
+    private struct Credentials: Sendable {
         let token: String
         let expiresAt: Date?
     }
 
-    private static func readCredentials() -> Credentials? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "Claude Code-credentials",
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne,
-        ]
-        var item: CFTypeRef?
-        guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess,
-              let data = item as? Data,
+    private nonisolated static func readCredentials() -> Credentials? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/security")
+        process.arguments = ["find-generic-password", "-s", "Claude Code-credentials", "-w"]
+        let out = Pipe()
+        process.standardOutput = out
+        process.standardError = FileHandle.nullDevice
+        guard (try? process.run()) != nil else { return nil }
+        let raw = out.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        guard process.terminationStatus == 0,
+              var text = String(data: raw, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !text.isEmpty else { return nil }
+        // `security -w` prints non-ASCII secrets as hex.
+        if !text.hasPrefix("{"), text.count % 2 == 0, text.allSatisfy(\.isHexDigit) {
+            var bytes = [UInt8]()
+            var i = text.startIndex
+            while i < text.endIndex {
+                let j = text.index(i, offsetBy: 2)
+                guard let b = UInt8(text[i..<j], radix: 16) else { return nil }
+                bytes.append(b)
+                i = j
+            }
+            text = String(decoding: bytes, as: UTF8.self)
+        }
+        guard let data = text.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let oauth = obj["claudeAiOauth"] as? [String: Any],
               let token = oauth["accessToken"] as? String, !token.isEmpty else { return nil }
